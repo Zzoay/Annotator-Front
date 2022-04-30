@@ -31,7 +31,7 @@ export class landRelevant {     // 模块二
 }
 
 export function getConv(convId) {
-    return request('http://localhost:8000/api/conv_dep/' + convId, '', 'get')
+    return request('http://localhost:8000/api/conv_dep?convId=' + convId, '', 'get')
 }
 
 export function getConvIds() {

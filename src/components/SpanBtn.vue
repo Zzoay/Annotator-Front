@@ -11,7 +11,7 @@ const props = defineProps<{
 
 // computed
 const itemColor = computed(() => {
-    return props.item.id.split('-')[1] == '1' ? '#F19D57' : ''
+    return props.item.id == 1 ? '#F19D57' : ''
 })
 </script>
 
@@ -22,7 +22,7 @@ const itemColor = computed(() => {
         :style="{'color': itemColor}"
         :class="props.isSelected ? 'active' : ''"
         >
-        {{item.label}}
+        {{item.word}}
     </button>
 </template>
 

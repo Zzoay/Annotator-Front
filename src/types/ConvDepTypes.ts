@@ -6,8 +6,8 @@ export type TabType = {
 }
 
 export type ItemType = {
-    id: string
-    label: string
+    id: number
+    word: string
 }
 
 export type UteranceType = {

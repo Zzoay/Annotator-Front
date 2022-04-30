@@ -22,25 +22,25 @@ const curTab = ref(tabs[0])
 
 const convIds: Array<Number> = reactive([])
 const convId = ref(0)
-const utterances: Array<UteranceType> = reactive([])
+const convs: Array<UteranceType> = reactive([])
 
 async function init() {
     await getConvIds().then((response: any) => {
-    let tmp = response.data
-    if (tmp.length > 0) {
-        convIds.values = tmp
-    }}
-    )
+        let res = response.data
+        for (let i = 0; i < res.length; i++) {
+            convIds.push(res[i]['conv_id'])
+        }
+    })
 
-    convId.value = Number(convIds.values[0].utrsId)
+    convId.value = Number(convIds[0])
 
     await getConv(convId.value).then((response: any) => {
-    let tmp = eval(response.data.items)
-    for (let i=0; i<tmp.length; i++) {
-        utterances[i] = tmp[i]
+        let res = response.data
+        for (let i = 0; i < res.length; i++) {
+            convs[i] = res[i]
+            }
         }
-    }
-    )
+        )
 } 
 
 let selectedId = ref("")
@@ -74,7 +74,7 @@ function calCrdns(start: number[], end: number[], highOffset: number, curLevel: 
     return startStr + ' ' + mid1 + ' ' + mid2 + ' ' + endStr
 }
 
-function selectAndLink(item: ItemType, target: any) {  // 事实上是TargetEvent,但此处会报错：没有offsetLeft和offsetTop
+function selectAndLink(utrId: number, itemId: number, target: any) {  // 事实上是TargetEvent,但此处会报错：没有offsetLeft和offsetTop
     // 对span进行连接
     if (selectedId.value != "") {
         end = [target.offsetLeft, target.offsetTop]
@@ -93,7 +93,7 @@ function selectAndLink(item: ItemType, target: any) {  // 事实上是TargetEven
         }
     }
     else {
-        selectedId.value = item.id
+        selectedId.value = utrId + '-' + itemId
         start = [target.offsetLeft, target.offsetTop]
     }
 }
@@ -273,10 +273,10 @@ function deleteLink(link: LinkType) {
     
     <div class="words-view">
 
-      <div :class="'utterance ' + utterance.id" v-for="utterance in utterances" :key="utterance.id">
+      <div :class="'utterance ' + utterance.id" v-for="utterance in convs" :key="utterance.id">
 
-      <SpanBtn v-for="item in utterance.items" :key="item.id" :item="item" :is-selected="item.id === selectedId"
-        @click="selectAndLink(item, $event.target)" @keyup.esc="cancelSelected">
+      <SpanBtn v-for="item in utterance.items" :key="item.id" :item="item" :is-selected="utterance.id + '-' + item.id === selectedId"
+        @click="selectAndLink(utterance.id, item.id, $event.target)" @keyup.esc="cancelSelected">
       </SpanBtn>
 
       </div>
