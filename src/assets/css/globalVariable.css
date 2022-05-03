@@ -1,0 +1,44 @@
+
+.btn {
+    box-shadow: none;
+}
+
+.btn-outline-primary{
+    color: #3461b4;
+    border-color: #3461b4;
+    /* background-color: #984442; */
+}
+
+.btn-outline-primary:hover{
+    color: #fff;
+    border-color: #3461b4;
+    background-color: #3461b4 !important;
+}
+
+.btn-outline-success{
+    color: #317352;
+    border-color: #317352;
+    /* background-color: #984442; */
+}
+
+.btn-outline-success:hover{
+    color: #fff;
+    border-color: #317352;
+    background-color: #317352 !important;
+}
+
+.btn-outline-danger{
+    color: #bf4343;
+    border-color: #bf4343;
+    /* background-color: #984442; */
+}
+
+.btn-outline-danger:hover{
+    color: #fff;
+    border-color: #bf4343;
+    background-color: #bf4343 !important;
+}
+
+
+
+

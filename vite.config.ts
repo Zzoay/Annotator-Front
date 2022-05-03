@@ -7,9 +7,10 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        charset: false
+        charset: false,
+        additionalData: '@import "src/assets/scss/globalVariable.scss";'
       }
     }
   },
-  base: './'
+  // base: './'
 })

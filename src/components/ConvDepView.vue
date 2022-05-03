@@ -4,35 +4,42 @@ import {onBeforeMount, reactive, ref} from 'vue'
 import LinkTabs from './LinkTabs.vue'
 import SpanBtn from './SpanBtn.vue'
 import DepLinkDraw from './DepLinkDraw.vue'
-import { ItemType, UteranceType, LinkType } from '../types/ConvDepTypes'
-import {getConv, getConvIds} from '../api/api'
+import { UteranceType, LinkType, TabType } from '../types/ConvDepTypes'
+import {getRelation, getConv, getConvId} from '../api/api'
 
 
 // data ------------>
 const header = '对话依存分析'
 
 // TODO: 从后端添加(动态或静态)
-const tabs = [
-    { id: 0, name: '当事', linkColor: '#F1C757' },
-    { id: 1, name: '施事', linkColor: '#6BB06C' },
-    { id: 2, name: '受事', linkColor: '#57AAF1' },
-    { id: 3, name: '涉事', linkColor: '#8F6BB0' },
-]
-const curTab = ref(tabs[0])
+// const tabs = [
+//     { id: 0, name: '当事', linkColor: '#F1C757' },
+//     { id: 1, name: '施事', linkColor: '#6BB06C' },
+//     { id: 2, name: '受事', linkColor: '#57AAF1' },
+//     { id: 3, name: '涉事', linkColor: '#8F6BB0' },
+// ]
+const tabs: Array<TabType> = reactive([])
+let curTabId = ref(0)
 
-const convIds: Array<Number> = reactive([])
-const convId = ref(0)
+// const convIds: Array<Number> = reactive([])
+let convId = ref(0)
 const convs: Array<UteranceType> = reactive([])
 
 async function init() {
-    await getConvIds().then((response: any) => {
+    await getRelation().then((response: any) => {
         let res = response.data
+        console.log(res)
         for (let i = 0; i < res.length; i++) {
-            convIds.push(res[i]['conv_id'])
+            tabs[i] = {id: i, name: res[i]['name'], linkColor: "#" + res[i]['color'] }
         }
     })
 
-    convId.value = Number(convIds[0])
+    curTabId.value = tabs[0].id
+
+    await getConvId().then((response: any) => {
+        let res = response.data
+        convId.value = res['conv_id']
+    })
 
     await getConv(convId.value).then((response: any) => {
         let res = response.data
@@ -98,7 +105,7 @@ function selectAndLink(utrId: number, itemId: number, target: any) {  // 事实�
     }
 }
 
-function schedule(start: number[], end: number[], highOffset: number, curLevel = 1, relType: number = curTab.value.id, down = false){    // curLevel表示应当加入的层数，默认加入第0层；orient表示方向，1为向上，-1向下
+function schedule(start: number[], end: number[], highOffset: number, curLevel = 1, relType = curTabId.value, down = false){    // curLevel表示应当加入的层数，默认加入第0层；orient表示方向，1为向上，-1向下
     let preLevel = curLevel 
     if (down){
         preLevel += 1  // 判断删除元素后下降的情况
@@ -195,7 +202,7 @@ function linkDiffHigh(start:number[], end: number[]) {
         end: end,
         coordinates: '',
         highOffset: -1,
-        relType: curTab.value.id,
+        relType: curTabId.value,
         linkType: 'curve',
         level: 0
     }
@@ -254,40 +261,75 @@ function deleteLink(link: LinkType) {
         }
     }
 }
+
+function updateConv(shift: number){
+    convId.value = convId.value + shift
+    // TODO: 对话关系保存逻辑
+    getConv(convId.value).then((response: any) => {
+        let res = response.data
+        if (res.length == 0) {
+            alert("已经没有更多数据了")
+            convId.value = convId.value - shift 
+        }
+        for (let i = 0; i < res.length; i++) {
+            convs[i] = res[i]
+        }
+    })
+}
 // <--------------
 
 </script>
 
 <template>
-    <h1>{{ header }}</h1>
-
-    <LinkTabs             
-        v-for="tab in tabs" 
-        :key="tab.id" 
-        :tab="tab"
-        :cur-tab=curTab
-        :class="curTab.id === tab.id ? 'active': ''" 
-        @click="curTab = tab">
-        
-    </LinkTabs>
+    <div class="main-panel">
     
-    <div class="words-view">
+    <h1>{{ header }}</h1>
+        <LinkTabs             
+            v-for="tab in tabs" 
+            :key="tab.id" 
+            :tab="tab"
+            :cur-tab-id=curTabId
+            :class="curTabId === tab.id ? 'active': ''" 
+            @click="curTabId = tab.id">
+            
+        </LinkTabs>
+        
+        <div class="words-view">
 
-      <div :class="'utterance ' + utterance.id" v-for="utterance in convs" :key="utterance.id">
+        <div :class="'utterance ' + utterance.id" v-for="utterance in convs" :key="utterance.id">
 
-      <SpanBtn v-for="item in utterance.items" :key="item.id" :item="item" :is-selected="utterance.id + '-' + item.id === selectedId"
-        @click="selectAndLink(utterance.id, item.id, $event.target)" @keyup.esc="cancelSelected">
-      </SpanBtn>
+        <SpanBtn v-for="item in utterance.items" :key="item.id" :item="item" :is-selected="utterance.id + '-' + item.id === selectedId"
+            @click="selectAndLink(utterance.id, item.id, $event.target)" @keyup.esc="cancelSelected">
+        </SpanBtn>
 
-      </div>
+        </div>
 
-      <DepLinkDraw :links=links @delete-link="deleteLink" :tabs="tabs"></DepLinkDraw>
+        <DepLinkDraw :links=links @delete-link="deleteLink" :tabs="tabs"></DepLinkDraw>
 
+        </div>
+    </div>
+
+    <div class="bottom-ctrls">
+        <button class="btn btn-outline-primary" @click="updateConv(-1)">上一个</button>
+        <!--TODO: 弹出对话框确认 -->
+        <button class="btn btn-outline-danger">取消</button>
+        <button class="btn btn-outline-success" >保存</button>
+        <button class="btn btn-outline-primary" @click="updateConv(+1)">下一个</button>
     </div>
 
 </template>
 
-<style scoped>
+<style scoped lang="css">
+ .main-panel {
+    position: relative;
+    background: #fff;
+    padding: 2rem;
+    margin: 1rem;
+    /* margin: 80px 0px 0px 0px; */
+    border-radius: 3px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.12), 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+    width: 100%;
+  }
   h1 {
       margin: 0px 0px 20px 0px;
   }
@@ -334,4 +376,16 @@ function deleteLink(link: LinkType) {
     padding: 6px 8px;
     z-index: 10;
   }
+
+  .bottom-ctrls {
+    text-align: center;
+    margin: 20px 0px 20px 0px;
+    padding: 20px 0px 20px 0px;
+  }
+
+  .bottom-ctrls > button{
+    box-shadow: none;
+    margin: 0px 25px;
+  }
+
 </style>

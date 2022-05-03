@@ -6,22 +6,22 @@ import { TabType } from '../types/ConvDepTypes'
 
 const props = defineProps<{ 
     tab: TabType,
-    curTab: TabType
+    curTabId: Number,
 }>()
 
 // computed
 const bgColor = computed(() => {
-    return props.curTab.id == props.tab.id ? props.tab.linkColor : '#fff'
+    return props.curTabId == props.tab.id ? props.tab.linkColor : '#fff'
 })
 
 const color = computed(() => {
-    return props.curTab.id == props.tab.id ? '#fff' : props.tab.linkColor
+    return props.curTabId == props.tab.id ? '#fff' : props.tab.linkColor
 })
 </script>
 
 <template>
     <button 
-        class="btn btn-outline-secondary" 
+        class="btn" 
         :style="{'box-shadow': 'none', 'color':color, 'border-color': tab.linkColor, 'background-color': bgColor}"
     >
     {{tab.name}}
@@ -29,9 +29,9 @@ const color = computed(() => {
 </template>
 
 <style scoped>
-button {
+.btn {
     background-color: #fff;
-    padding: 4px 6px;
+    padding: 2px 4px;
     margin: 8px;
 }
 
