@@ -23,7 +23,7 @@ defineEmits<{
             v-for="link in links.flat()" 
             :key="link.id" 
             :link="link" 
-            :link-stroke="tabs[link.relType].linkColor"
+            :link-stroke="tabs.length > 0 ? tabs[link.relType].linkColor : ''"
         >
         </component>
     </svg>
@@ -33,8 +33,8 @@ defineEmits<{
             v-for="link in links.flat()" 
             :key="link.id" 
             :link="link" 
-            :link-stroke="tabs[link.relType].linkColor" 
-            :tag-name="tabs[link.relType].name"
+            :link-stroke="tabs.length > 0 ? tabs[link.relType].linkColor : ''" 
+            :tag-name="tabs.length > 0 ? tabs[link.relType].name : ''"
             @delete-link="$emit('deleteLink', link)"
         >
         </DepLinkTag>

@@ -1,36 +1,28 @@
-// @ts-ignore 
 <script setup lang="ts">
-import {onBeforeMount, reactive, ref} from 'vue'
+import {onBeforeMount, onMounted, getCurrentInstance, reactive, ref, onBeforeUpdate, onUpdated, watch} from 'vue'
 import LinkTabs from './LinkTabs.vue'
 import SpanBtn from './SpanBtn.vue'
 import DepLinkDraw from './DepLinkDraw.vue'
 import { UteranceType, LinkType, TabType } from '../types/ConvDepTypes'
-import {getRelation, getConv, getConvId} from '../api/api'
+import {getRelation, getConv, getConvId, getRelationship} from '../api/api'
 
 
 // data ------------>
 const header = '对话依存分析'
 
-// TODO: 从后端添加(动态或静态)
-// const tabs = [
-//     { id: 0, name: '当事', linkColor: '#F1C757' },
-//     { id: 1, name: '施事', linkColor: '#6BB06C' },
-//     { id: 2, name: '受事', linkColor: '#57AAF1' },
-//     { id: 3, name: '涉事', linkColor: '#8F6BB0' },
-// ]
-const tabs: Array<TabType> = reactive([])
 let curTabId = ref(0)
+const tabs: Array<TabType> = reactive([])
 
-// const convIds: Array<Number> = reactive([])
 let convId = ref(0)
 const convs: Array<UteranceType> = reactive([])
+
+const relships: Array<object> = reactive([])
 
 async function init() {
     await getRelation().then((response: any) => {
         let res = response.data
-        console.log(res)
         for (let i = 0; i < res.length; i++) {
-            tabs[i] = {id: i, name: res[i]['name'], linkColor: "#" + res[i]['color'] }
+            tabs.push({id: i, name: res[i]['name'], linkColor: "#" + res[i]['color']})
         }
     })
 
@@ -44,10 +36,16 @@ async function init() {
     await getConv(convId.value).then((response: any) => {
         let res = response.data
         for (let i = 0; i < res.length; i++) {
-            convs[i] = res[i]
-            }
+            convs.push(res[i])
         }
-        )
+    })
+    
+    await getRelationship(convId.value).then((response: any) => {
+        let res = response.data
+        for (let i = 0; i < res.length; i++) {
+            relships.push(res[i])
+        }
+    })
 } 
 
 let selectedId = ref("")
@@ -56,13 +54,68 @@ let end: number[] = []
 let links = ref<Array<Array<LinkType>>>([[]])  // 默认第0层为上下连接
 let linkNums = 0 // 连接的数量，包括删除的，用以保证连接id的唯一性
 const levelHigh = 25  // 单层高度
+
+
+const targets = []
+let tmp = []
+const utrDom = (el) => {
+    // console.log(el.childNodes[1])
+    let childs = el.childNodes
+    for (let i = 0; i < childs.length; i++){
+        if (childs[i].nodeName == '#text') {
+            continue
+        }
+        // @ts-ignore 
+        tmp.push([childs[i].offsetLeft, childs[i].offsetTop])
+    }
+    // @ts-ignore 
+    targets.push(tmp)
+    tmp = []
+}
+
+
+init()
+
+let flag = true
+watch(relships, (newValue, oldValue) => {
+    if (flag) {
+        console.log('watch 已触发', newValue)
+        console.log(relships.length)
+        console.log(targets)
+        console.log(tabs)
+        for (let i = 0; i < relships.length; i ++) {
+            let headSplit = relships[i]['head'].split('-')
+            let headUtr = Number(headSplit[0])
+            let headWord = Number(headSplit[1])
+            let tailSplit = relships[i]['tail'].split('-')
+            let tailUtr = Number(tailSplit[0])
+            let tailWord = Number(tailSplit[1])
+
+            // -1是因为targets从0开始，而我们默认的句子和词语的下标从1开始
+            let start = targets[headUtr - 1][headWord - 1] 
+            let end = targets[tailUtr - 1][tailWord - 1]
+            
+            // 判断是句内还是跨句
+            if (headUtr == tailUtr)
+                schedule(start, end, relships[i]['head'], relships[i]['tail'], start[1], 1, relships[i]['relation'] - 1)  // 关系数组从0开始
+            else
+                linkDiffHigh(start, end, relships[i]['head'], relships[i]['tail'], relships[i]['relation'] - 1)
+        } 
+        flag = false  
+    }
+})
+
 // <----------------
 
 
 // hooks -------->
 onBeforeMount(() =>{
-    init()
+    // init()
 })
+onMounted(() =>{
+
+})
+
 // <-------
 
 
@@ -91,12 +144,12 @@ function selectAndLink(utrId: number, itemId: number, target: any) {  // 事实�
         
         // 同一高度的span进行连接，为防止重合，需要进行全局的调度
         if (start[1] == end[1]) {
-            schedule(start, end, highOffset)
+            schedule(start, end, selectedId.value, utrId + '-' + itemId, highOffset)
         }
         // 不同高度的span进行连接
         else {
             console.log("不同高度的span进行连接")
-            linkDiffHigh(start, end)
+            linkDiffHigh(start, end, selectedId.value, utrId + '-' + itemId)
         }
     }
     else {
@@ -105,7 +158,7 @@ function selectAndLink(utrId: number, itemId: number, target: any) {  // 事实�
     }
 }
 
-function schedule(start: number[], end: number[], highOffset: number, curLevel = 1, relType = curTabId.value, down = false){    // curLevel表示应当加入的层数，默认加入第0层；orient表示方向，1为向上，-1向下
+function schedule(start: number[], end: number[], startId: string, endId: string, highOffset: number, curLevel = 1, relType = curTabId.value, down = false){    // curLevel表示应当加入的层数，默认加入第0层；orient表示方向，1为向上，-1向下
     let preLevel = curLevel 
     if (down){
         preLevel += 1  // 判断删除元素后下降的情况
@@ -137,7 +190,7 @@ function schedule(start: number[], end: number[], highOffset: number, curLevel =
                 console.log("情况2:当前元素应包裹加入的元素")
                 // 先删除后添加
                 level.splice(j, 1)
-                schedule(curr.start, curr.end, curr.highOffset, i + 1, curr.relType)
+                schedule(curr.start, curr.end, curr.startId, curr.endId, curr.highOffset, i + 1, curr.relType)
             }
             // 3. x1 <= c1 < c2 <= x2，即加入的元素应包裹当前元素 => 待加入元素元素上升到上一层并和该层元素对比
             else if (x1 <= c1 && c2 <= x2){
@@ -154,7 +207,7 @@ function schedule(start: number[], end: number[], highOffset: number, curLevel =
                 }
                 else{  // 当前元素更长
                     level.splice(j, 1)
-                    schedule(curr.start, curr.end, curr.highOffset, i + 1, curr.relType)
+                    schedule(curr.start, curr.end, curr.startId, curr.endId, curr.highOffset, i + 1, curr.relType)
                 }
             }
         }
@@ -165,6 +218,8 @@ function schedule(start: number[], end: number[], highOffset: number, curLevel =
                 coordinates: calCrdns(start, end, highOffset, curLevel),
                 start: start,
                 end: end,
+                startId: startId,
+                endId: endId,
                 highOffset: highOffset,
                 relType: relType,
                 linkType: 'polyline',
@@ -182,6 +237,8 @@ function schedule(start: number[], end: number[], highOffset: number, curLevel =
             coordinates: calCrdns(start, end, highOffset, curLevel),
             start: start,
             end: end,
+            startId: startId,
+            endId: endId,
             highOffset: highOffset,
             relType: relType,
             linkType: 'polyline',
@@ -195,14 +252,16 @@ function schedule(start: number[], end: number[], highOffset: number, curLevel =
     end = []
 }
 
-function linkDiffHigh(start:number[], end: number[]) {
+function linkDiffHigh(start:number[], end: number[], startId: string, endId: string, relType = curTabId.value) {
     let item = {
         id: linkNums++,
         start: start,
         end: end,
+        startId: startId,
+        endId: endId,
         coordinates: '',
         highOffset: -1,
-        relType: curTabId.value,
+        relType: relType,
         linkType: 'curve',
         level: 0
     }
@@ -250,7 +309,7 @@ function deleteLink(link: LinkType) {
                 let curr = links.value[i][j]
                 let highOffset = curr.highOffset + levelHigh  // 先降低一层
                 links.value[i].splice(j, 1)
-                schedule(curr.start, curr.end, highOffset, i - 1, curr.relType, true)
+                schedule(curr.start, curr.end, curr.startId, curr.endId, highOffset, i - 1, curr.relType, true)
             }
             // 否则寻找删除的元素
             else if (link === links.value[i][j]) {
@@ -276,6 +335,11 @@ function updateConv(shift: number){
         }
     })
 }
+
+// function getOffset(){
+//     console.log(utrs)
+//     console.log(utrs.offsetTop)
+// }
 // <--------------
 
 </script>
@@ -296,9 +360,10 @@ function updateConv(shift: number){
         
         <div class="words-view">
 
-        <div :class="'utterance ' + utterance.id" v-for="utterance in convs" :key="utterance.id">
+        <div :class="'utterance ' + utterance.id" v-for="utterance in convs" :key="utterance.id" :ref="utrDom">
 
-        <SpanBtn v-for="item in utterance.items" :key="item.id" :item="item" :is-selected="utterance.id + '-' + item.id === selectedId"
+        <SpanBtn v-for="item in utterance.items" :key="item.id" :item="item" ref="words"
+            :is-selected="utterance.id + '-' + item.id === selectedId"
             @click="selectAndLink(utterance.id, item.id, $event.target)" @keyup.esc="cancelSelected">
         </SpanBtn>
 

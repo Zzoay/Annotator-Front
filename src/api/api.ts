@@ -41,3 +41,7 @@ export function getConvId() {
 export function getRelation() {
     return request('http://localhost:8000/api/relation/', '', 'get')
 }
+
+export function getRelationship(convId) {
+    return request('http://localhost:8000/api/relationship/', {'convId': convId}, 'get')
+}

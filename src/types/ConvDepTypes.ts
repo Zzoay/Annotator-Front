@@ -20,8 +20,8 @@ export type LinkType = {
     coordinates: string
     start: number[]
     end: number[]
-    // startId: string
-    // endId: string
+    startId: string
+    endId: string
     highOffset: number
     relType: number
     linkType: string
