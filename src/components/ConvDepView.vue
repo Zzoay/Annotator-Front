@@ -3,8 +3,9 @@ import {onBeforeMount, onMounted, getCurrentInstance, reactive, ref, onBeforeUpd
 import LinkTabs from './LinkTabs.vue'
 import SpanBtn from './SpanBtn.vue'
 import DepLinkDraw from './DepLinkDraw.vue'
-import { UteranceType, LinkType, TabType } from '../types/ConvDepTypes'
-import {getRelation, getConv, getConvId, getRelationship} from '../api/api'
+import Dialog from './Dialog.vue'
+import { UteranceType, LinkType, TabType, RelshipType } from '../types/ConvDepTypes'
+import {getRelation, getConv, getConvId, getRelationship, postRelationship, deleteRelationship} from '../api/api'
 
 
 // data ------------>
@@ -16,13 +17,13 @@ const tabs: Array<TabType> = reactive([])
 let convId = ref(0)
 const convs: Array<UteranceType> = reactive([])
 
-const relships: Array<object> = reactive([])
+const relships: Array<RelshipType> = reactive([])
 
 async function init() {
     await getRelation().then((response: any) => {
         let res = response.data
         for (let i = 0; i < res.length; i++) {
-            tabs.push({id: i, name: res[i]['name'], linkColor: "#" + res[i]['color']})
+            tabs[i] = {id: i, name: res[i]['name'], linkColor: "#" + res[i]['color']}
         }
     })
 
@@ -36,17 +37,18 @@ async function init() {
     await getConv(convId.value).then((response: any) => {
         let res = response.data
         for (let i = 0; i < res.length; i++) {
-            convs.push(res[i])
+            convs[i] = res[i]
         }
     })
     
     await getRelationship(convId.value).then((response: any) => {
         let res = response.data
         for (let i = 0; i < res.length; i++) {
-            relships.push(res[i])
+            relships[i] = res[i]
         }
     })
 } 
+init()
 
 let selectedId = ref("")
 let start: number[] = []
@@ -55,7 +57,7 @@ let links = ref<Array<Array<LinkType>>>([[]])  // 默认第0层为上下连接
 let linkNums = 0 // 连接的数量，包括删除的，用以保证连接id的唯一性
 const levelHigh = 25  // 单层高度
 
-
+// 得到每个词的位置信息
 const targets = []
 let tmp = []
 const utrDom = (el) => {
@@ -74,15 +76,13 @@ const utrDom = (el) => {
 }
 
 
-init()
+const showModal = ref(false) 
+const doAction = ref(false) 
 
-let flag = true
+// 初始化关系连接
+let relFlag = true
 watch(relships, (newValue, oldValue) => {
-    if (flag) {
-        console.log('watch 已触发', newValue)
-        console.log(relships.length)
-        console.log(targets)
-        console.log(tabs)
+    if (relFlag) {
         for (let i = 0; i < relships.length; i ++) {
             let headSplit = relships[i]['head'].split('-')
             let headUtr = Number(headSplit[0])
@@ -97,11 +97,12 @@ watch(relships, (newValue, oldValue) => {
             
             // 判断是句内还是跨句
             if (headUtr == tailUtr)
-                schedule(start, end, relships[i]['head'], relships[i]['tail'], start[1], 1, relships[i]['relation'] - 1)  // 关系数组从0开始
+                // 关系数组从0开始，而我们默认的句子和词语的下标从1开始，这里未对齐，而在DepLinkDraw中，通过-1对齐了
+                schedule(start, end, relships[i]['head'], relships[i]['tail'], start[1], 1, relships[i]['relation']) 
             else
-                linkDiffHigh(start, end, relships[i]['head'], relships[i]['tail'], relships[i]['relation'] - 1)
+                linkDiffHigh(start, end, relships[i]['head'], relships[i]['tail'], relships[i]['relation'])
         } 
-        flag = false  
+        relFlag = false  
     }
 })
 
@@ -158,7 +159,7 @@ function selectAndLink(utrId: number, itemId: number, target: any) {  // 事实�
     }
 }
 
-function schedule(start: number[], end: number[], startId: string, endId: string, highOffset: number, curLevel = 1, relType = curTabId.value, down = false){    // curLevel表示应当加入的层数，默认加入第0层；orient表示方向，1为向上，-1向下
+function schedule(start: number[], end: number[], startId: string, endId: string, highOffset: number, curLevel = 1, relType = curTabId.value + 1, down = false){    // curLevel表示应当加入的层数，默认加入第0层；orient表示方向，1为向上，-1向下
     let preLevel = curLevel 
     if (down){
         preLevel += 1  // 判断删除元素后下降的情况
@@ -252,7 +253,7 @@ function schedule(start: number[], end: number[], startId: string, endId: string
     end = []
 }
 
-function linkDiffHigh(start:number[], end: number[], startId: string, endId: string, relType = curTabId.value) {
+function linkDiffHigh(start:number[], end: number[], startId: string, endId: string, relType = curTabId.value + 1) {
     let item = {
         id: linkNums++,
         start: start,
@@ -321,25 +322,127 @@ function deleteLink(link: LinkType) {
     }
 }
 
-function updateConv(shift: number){
-    convId.value = convId.value + shift
-    // TODO: 对话关系保存逻辑
-    getConv(convId.value).then((response: any) => {
-        let res = response.data
-        if (res.length == 0) {
-            alert("已经没有更多数据了")
-            convId.value = convId.value - shift 
+const action = ref()
+const actionArgs = ref()
+
+function judgeExist(example, samples){
+    for (var i = 0; i < samples.length; i++) {
+        if (JSON.stringify({
+            head: example.startId,
+            tail: example.endId,
+            relation: example.relType
+        }) == JSON.stringify({
+            head: samples[i].head,
+            tail: samples[i].tail,
+            relation: samples[i].relation
+        })) {
+            return true
         }
-        for (let i = 0; i < res.length; i++) {
-            convs[i] = res[i]
-        }
-    })
+    }
+    return false
 }
 
-// function getOffset(){
-//     console.log(utrs)
-//     console.log(utrs.offsetTop)
-// }
+function updateConv(shift: number) {
+    showModal.value = true
+
+    if (doAction.value) {
+        convId.value = convId.value + shift
+        // TODO: 对话关系保存逻辑
+        cleanLinks()
+        relships.length = 0
+        console.log(relships)
+
+        getConv(convId.value).then((response: any) => {
+            let res = response.data
+            if (res.length == 0) {
+                alert("已经没有更多数据了")
+                convId.value = convId.value - shift 
+            }
+            for (let i = 0; i < res.length; i++) {
+                convs[i] = res[i]
+            }
+        })
+
+        relFlag = true
+        getRelationship(convId.value).then((response: any) => {
+            let res = response.data
+            for (let i = 0; i < res.length; i++) {
+                relships.push(res[i])
+            }
+        })
+
+        doAction.value = false
+    }
+    action.value = updateConv
+    actionArgs.value = shift
+}
+
+function cleanLinks() {
+    showModal.value = true
+    if (doAction.value) {   
+        // 完全清空 
+        links.value = []
+        links.value.push([])
+        linkNums = 0 
+        doAction.value = false
+    }
+    action.value = cleanLinks
+}
+
+function cancelLinks() {
+    showModal.value = true
+    if (doAction.value) {   
+        // 清空未保存的数据
+        for (let i = 0; i < links.value.length; i++) {
+            for (let j = 0; j < links.value[i].length; j++) {
+                if (!judgeExist(links.value[i][j], relships)) {
+                    links.value[i].splice(j, 1)
+                    linkNums--
+                }
+            }
+        }
+        doAction.value = false
+    }
+    action.value = cancelLinks
+}
+
+function saveLinks(){
+    showModal.value = true
+    // 确认框
+    if (doAction.value) {
+        // 先删除
+        for (let i = 0; i < relships.length; i++) {
+            deleteRelationship(relships[i].id)
+        }
+        // 后添加
+        let tmp = {}
+        for (let i = 0; i < links.value.flat().length; i++) {
+            tmp = {
+                conv: convId.value,
+                head: links.value.flat()[i].startId,
+                tail: links.value.flat()[i].endId,
+                relation: links.value.flat()[i].relType,
+            }
+            postRelationship(tmp)
+        }
+        doAction.value = false
+    }
+    action.value = saveLinks
+}
+
+function cofirmAction(func, args = null) {  // TODO: 如何传递数组参数，类似于Python的*args
+    if (args != null) {
+        func(args)
+    }
+    else {
+        func()
+    }
+    showModal.value = false
+}
+
+function hideModal(){
+    showModal.value = false 
+}
 // <--------------
 
 </script>
@@ -377,10 +480,15 @@ function updateConv(shift: number){
     <div class="bottom-ctrls">
         <button class="btn btn-outline-primary" @click="updateConv(-1)">上一个</button>
         <!--TODO: 弹出对话框确认 -->
-        <button class="btn btn-outline-danger">取消</button>
-        <button class="btn btn-outline-success" >保存</button>
+        <button class="btn btn-outline-danger" @click="cancelLinks">取消</button>
+        <button class="btn btn-outline-success" @click="saveLinks">保存</button>
         <button class="btn btn-outline-primary" @click="updateConv(+1)">下一个</button>
     </div>
+
+    <Dialog :showModal="showModal" @hide-modal="hideModal" @doAction="doAction=true; cofirmAction(action, actionArgs);"> 
+        <template #title>确认</template>
+            确认操作吗？
+    </Dialog>
 
 </template>
 

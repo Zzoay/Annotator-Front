@@ -59,6 +59,18 @@ return new Promise((resolve,reject)=>{
       url,
       data:params
     })
+  }else if( type.toUpperCase()=== 'DELETE' ){
+    promise = axios({
+      method:'DELETE',
+      url,
+      data:params
+    })
+  }else if( type.toUpperCase()=== 'PUT' ){
+    promise = axios({
+      method:'PUT',
+      url,
+      data:params
+    })
   }
   //处理返回
   promise.then(res=>{

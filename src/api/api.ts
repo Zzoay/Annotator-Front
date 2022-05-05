@@ -45,3 +45,11 @@ export function getRelation() {
 export function getRelationship(convId) {
     return request('http://localhost:8000/api/relationship/', {'convId': convId}, 'get')
 }
+
+export function postRelationship(relationship) {
+    return request('http://localhost:8000/api/relationship/', relationship, 'post')
+}
+
+export function deleteRelationship(id) {
+    return request('http://localhost:8000/api/relationship/' + id, '', 'delete')
+}

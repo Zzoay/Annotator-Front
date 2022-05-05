@@ -27,3 +27,10 @@ export type LinkType = {
     linkType: string
     level: number
 }
+
+export type RelshipType = {
+    id: number
+    conv: number
+    head: string
+    tail: string
+}
