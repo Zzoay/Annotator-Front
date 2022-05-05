@@ -327,21 +327,8 @@ function deleteLink(link: LinkType) {
     }
 }
 
-function judgeExist(example, samples) {
-    for (var i = 0; i < samples.length; i++) {
-        if (JSON.stringify({
-            head: example.startId,
-            tail: example.endId,
-            relation: example.relType
-        }) == JSON.stringify({
-            head: samples[i].head,
-            tail: samples[i].tail,
-            relation: samples[i].relation
-        })) {
-            return true
-        }
-    }
-    return false
+const sleep = (milliseconds) => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
 async function updateConv(shift: number) {
@@ -370,13 +357,10 @@ async function updateConv(shift: number) {
             }
         })
 
-        await getRelationship(convId.value).then((response: any) => {
-            let res = response.data
-            relFlag = true
-            for (let i = 0; i < res.length; i++) {
-                relships.value[i] = res[i]
-            }
-        })
+        // 更新连接
+        relFlag = true
+        await initRelships()
+
         saved.value = true
         doAction.value = false
     }
@@ -392,17 +376,25 @@ function cleanLinks() {
     doAction.value = false
 }
 
-function cancelLinks() {
+async function cancelLinks() {
+    if (saved.value) return
+    
+    // 弹窗确认
     showModal.value = true
-    dialogBody.value = "清空未保存的标注"
+    dialogBody.value = "取消标注，还原状态"
     if (doAction.value) {   
-        for (let i = 0; i < links.value.length; i++) {
-            for (let j = 0; j < links.value[i].length; j++) {
-                if (!judgeExist(links.value[i][j], relships.value)) {
-                    links.value[i].splice(j, 1)
-                }
-            }
-        }
+        // 清空连接
+        cleanLinks()
+        relships.value = []
+        
+        // 设置延时，保证清空完成后再更新
+        await sleep(10)
+
+        // 更新连接
+        relFlag = true
+        await initRelships()
+
+        saved.value = true
         doAction.value = false
     }
     action.value = cancelLinks
@@ -440,10 +432,7 @@ function cofirmAction(func, args = null) {  // ? 如何传递数组参数，类�
     else {
         func()
     }
-    showModal.value = false
-    nextPrev.value = false
-    dialogBody.value = "操作"
-    
+    hideModal()
 }
 
 function hideModal() {
