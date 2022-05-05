@@ -173,10 +173,10 @@ function schedule(start: number[], end: number[], startId: string, endId: string
     for (let i = curLevel; i < links.value.length; i++) {
         let level = links.value[i]
         // 计算当前元素属于第几层
-        for (let j = 0; j < level.length; j++){
+        for (let j = 0; j < level.length; j++) {
             let curr = level[j]
             // 如果待加入元素和当前元素的节点在不同层面（即二者为不同的话语），则不需要对比
-            if (start[1] != curr.start[1]){
+            if (start[1] != curr.start[1]) {
                 continue
             }
 
@@ -187,18 +187,18 @@ function schedule(start: number[], end: number[], startId: string, endId: string
             let c1 = curr.start[0] < curr.end[0] ? curr.start[0] : curr.end[0]
             let c2 = curr.start[0] < curr.end[0] ? curr.end[0] : curr.start[0]
             // 1. x1 < x2 <= c1 < c2 或 c1 < c2 <= x1 < x2，即无交叉，待加入元素和当前层元素继续对比
-            if (x2 <= c1 || c2 <= x1){
+            if (x2 <= c1 || c2 <= x1) {
                 console.log("情况1:无交叉，待加入元素和当前层元素继续对比")
             }
             // 2. c1 <= x1 < x2 <= c2，即当前元素应包裹加入的元素 => 当前元素上升到上一层并和该层元素对比，待加入元素和当前层元素继续对比
-            else if (c1 <= x1 && x2 <= c2){
+            else if (c1 <= x1 && x2 <= c2) {
                 console.log("情况2:当前元素应包裹加入的元素")
                 // 先删除后添加
                 level.splice(j, 1)
                 schedule(curr.start, curr.end, curr.startId, curr.endId, curr.highOffset, i + 1, curr.relType)
             }
             // 3. x1 <= c1 < c2 <= x2，即加入的元素应包裹当前元素 => 待加入元素元素上升到上一层并和该层元素对比
-            else if (x1 <= c1 && c2 <= x2){
+            else if (x1 <= c1 && c2 <= x2) {
                 console.log("情况3:加入的元素应包裹当前元素")
                 curLevel += 1
                 break
@@ -206,7 +206,7 @@ function schedule(start: number[], end: number[], startId: string, endId: string
             // 4. x1 < c1 < x2 < c2 或 c1 < x1 < c2 < x2，即交叉且非包裹关系，长度较长的上升到上一层
             else{
                 console.log("情况4:交叉且非包裹关系，长度较长的上升到上一层")
-                if (x2 - x1 >= c2 - c1){  // 待加入元素更长
+                if (x2 - x1 >= c2 - c1) {  // 待加入元素更长
                     curLevel += 1
                     break
                 }
@@ -216,7 +216,7 @@ function schedule(start: number[], end: number[], startId: string, endId: string
                 }
             }
         }
-        if(curLevel == i){  // 待加入元素符合当前层数要求
+        if (curLevel == i) {  // 待加入元素符合当前层数要求
             highOffset -= levelHigh * (curLevel - preLevel + 1)
             let item = {
                 id: linkNums++, 
@@ -310,14 +310,16 @@ function deleteLink(link: LinkType) {
     let deleted = false
     for (let i = 0; i < links.value.length; i++) {
         for (let j = 0; j < links.value[i].length; j++) {
-            // 如果删除了元素，则到上一层寻找元素进行动态的调整
+            if (links.value[i][j].start[1] != link.start[1]) 
+                continue
+            // 如果删除了连接，则到上一层寻找连接元素进行动态的调整
             if (deleted){
                 let curr = links.value[i][j]
                 let highOffset = curr.highOffset + levelHigh  // 先降低一层
                 links.value[i].splice(j, 1)
                 schedule(curr.start, curr.end, curr.startId, curr.endId, highOffset, i - 1, curr.relType, true)
             }
-            // 否则寻找删除的元素
+            // 否则寻找应删除的连接元素
             else if (link === links.value[i][j]) {
                 links.value[i].splice(j, 1)
                 deleted = true
@@ -378,7 +380,7 @@ function cleanLinks() {
 
 async function cancelLinks() {
     if (saved.value) return
-    
+
     // 弹窗确认
     showModal.value = true
     dialogBody.value = "取消标注，还原状态"
