@@ -33,4 +33,5 @@ export type RelshipType = {
     conv: number
     head: string
     tail: string
+    relation: number
 }
