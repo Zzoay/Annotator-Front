@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onBeforeMount, onMounted, getCurrentInstance, reactive, ref, onBeforeUpdate, onUpdated, watch} from 'vue'
+import {onBeforeMount, onMounted, getCurrentInstance, reactive, ref, onBeforeUpdate, onBeforeUnmount, watch} from 'vue'
 import LinkTabs from './LinkTabs.vue'
 import SpanBtn from './SpanBtn.vue'
 import DepLinkDraw from './DepLinkDraw.vue'
@@ -13,6 +13,14 @@ const header = '对话依存分析'
 
 let curTabId = ref(0)
 const tabs: Array<TabType> = reactive([])
+function initRelations() {
+    getRelation().then((response: any) => {
+        let res = response.data
+        for (let i = 0; i < res.length; i++) {
+            tabs[i] = {id: i, name: res[i]['name'], linkColor: "#" + res[i]['color']}
+        }
+    })
+}
 
 let convId = ref(0)
 const convs: Array<UteranceType> = reactive([])
@@ -28,12 +36,7 @@ function initRelships() {
 }
 
 async function init() {
-    await getRelation().then((response: any) => {
-        let res = response.data
-        for (let i = 0; i < res.length; i++) {
-            tabs[i] = {id: i, name: res[i]['name'], linkColor: "#" + res[i]['color']}
-        }
-    })
+    await initRelations()
     await getConvId().then((response: any) => {
         let res = response.data
         convId.value = res['conv_id']
@@ -114,10 +117,23 @@ const actionArgs = ref()  // 操作函数的参数
 
 // hooks -------->
 onBeforeMount(() => {
-    // init()
+    window.onbeforeunload = function (e) {
+        e = e || window.event
+ 
+        // 兼容IE8和Firefox 4之前的版本
+        if (e) {
+            e.returnValue = '关闭提示'
+        }
+        
+        // Chrome, Safari, Firefox 4+, Opera 12+ , IE 9+
+        return '关闭提示'
+    }
 })
 onMounted(() => {
 
+})
+onBeforeUnmount(() => {
+    window.onbeforeunload = null
 })
 
 // <-------
