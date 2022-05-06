@@ -38,9 +38,9 @@ const length = computed(() => {
 
 const transform = computed(() => {
     if (props.link.linkType == 'polyline') return
-    // 进行X轴方向缩放,距离越远,X值越大
-    let translateX = signX.value * 40 * (length.value / 120) - 10
-    // 进行Y轴方向缩放,距离越远,Y值越小
+    // 进行X轴方向缩放,X值越大,距离越远
+    let translateX = signX.value * length.value / 1.6 - 10
+    // 进行Y轴方向缩放,Y值越大,距离越近
     let translateY =  deg.value > 0 ? 14 * (60 / length.value) : -14 * (60 / length.value) - 10
     return 'rotate(' + deg.value + ') ' + "translate(" + translateX + ',' + translateY + ')'
 })
