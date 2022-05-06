@@ -5,7 +5,7 @@ import SpanBtn from './SpanBtn.vue'
 import DepLinkDraw from './DepLinkDraw.vue'
 import Dialog from './Dialog.vue'
 import { UteranceType, LinkType, TabType, RelshipType } from '../types/ConvDepTypes'
-import {getRelation, getConv, getConvId, getRelationship, postRelationship, deleteRelationship} from '../api/api'
+import {getRelation, getConv, updateConvTagged, getConvId, getRelationship, postRelationship, deleteRelationship} from '../api/api'
 
 
 // data ------------>
@@ -24,6 +24,9 @@ function initRelations() {
 
 let convId = ref(0)
 const convs: Array<UteranceType> = reactive([])
+function saveConvTagged() {
+    updateConvTagged(convId.value, true)
+}
 
 const relships = ref<Array<RelshipType>>([]) 
 function initRelships() {
@@ -91,8 +94,6 @@ watch(relships, (newValue, oldValue) => {
             let start = targets.value[headUtr - 1][headWord - 1] 
             let end = targets.value[tailUtr - 1][tailWord - 1]
             
-            console.log(targets.value)
-            console.log(relships.value)
             // 判断是句内还是跨句
             if (headUtr == tailUtr)
                 // 关系数组从0开始，而我们默认的句子和词语的下标从1开始，这里未对齐，而在DepLinkDraw中，通过-1对齐了
@@ -444,6 +445,7 @@ async function saveLinks() {
     }
     initRelships()
 
+    saveConvTagged()
     saved.value = true
 }
 
