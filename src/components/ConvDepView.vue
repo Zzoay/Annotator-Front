@@ -59,7 +59,7 @@ let linkNums = 0 // 连接的数量，包括删除的，用以保证连接id的�
 const levelHigh = 25  // 单层高度
 
 // 得到每个词的位置信息
-const targets = []
+const targets = ref([])
 let tmp = []
 const utrDom = (el) => {
     let childs = el.childNodes
@@ -71,7 +71,7 @@ const utrDom = (el) => {
         tmp.push([childs[i].offsetLeft, childs[i].offsetTop])
     }
     // @ts-ignore 
-    targets.push(tmp)
+    targets.value.push(tmp)
     tmp = []
 }
 
@@ -88,9 +88,11 @@ watch(relships, (newValue, oldValue) => {
             let tailWord = Number(tailSplit[1])
 
             // -1是因为targets从0开始，而我们默认的句子和词语的下标从1开始
-            let start = targets[headUtr - 1][headWord - 1] 
-            let end = targets[tailUtr - 1][tailWord - 1]
+            let start = targets.value[headUtr - 1][headWord - 1] 
+            let end = targets.value[tailUtr - 1][tailWord - 1]
             
+            console.log(targets.value)
+            console.log(relships.value)
             // 判断是句内还是跨句
             if (headUtr == tailUtr)
                 // 关系数组从0开始，而我们默认的句子和词语的下标从1开始，这里未对齐，而在DepLinkDraw中，通过-1对齐了
@@ -363,7 +365,8 @@ async function updateConv(shift: number) {
         // 清空连接
         cleanLinks()
         relships.value = []
-        
+    
+        console.log(convId.value)   
         await getConv(convId.value).then((response: any) => {
             let res = response.data
             if (res.length == 0) {
@@ -379,6 +382,7 @@ async function updateConv(shift: number) {
         relFlag = true
         await initRelships()
 
+        targets.value = []
         saved.value = true
         doAction.value = false
     }
