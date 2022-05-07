@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onBeforeMount, onMounted, getCurrentInstance, reactive, ref, onBeforeUpdate, onBeforeUnmount, watch} from 'vue'
+import {onBeforeMount, onMounted, getCurrentInstance, reactive, ref, ComponentInternalInstance, onBeforeUnmount, watch} from 'vue'
 import LinkTabs from './LinkTabs.vue'
 import SpanBtn from './SpanBtn.vue'
 import DepLinkDraw from './DepLinkDraw.vue'
@@ -115,6 +115,10 @@ const doAction = ref(false)  // 是否运行操作，默认为否，需要弹窗
 const action = ref()  // 操作函数（保存/删除）
 const actionArgs = ref()  // 操作函数的参数
 
+const linkSelectedId = ref(-1)  // 被选中的连接的ID
+
+const { proxy } = (getCurrentInstance() as ComponentInternalInstance)
+console.log('getCurrentInstance()中的proxy:', proxy)
 // <----------------
 
 
@@ -133,7 +137,7 @@ onBeforeMount(() => {
     }
 })
 onMounted(() => {
-
+    
 })
 onBeforeUnmount(() => {
     window.onbeforeunload = null
@@ -159,6 +163,7 @@ function calCrdns(start: number[], end: number[], highOffset: number, curLevel: 
 
 function selectAndLink(utrId: number, itemId: number, target: any) {  // 事实上是TargetEvent,但此处会报错：没有offsetLeft和offsetTop
     saved.value = false
+    linkSelectedId.value = -1
     // 对span进行连接
     if (selectedId.value != "") {
         end = [target.offsetLeft, target.offsetTop]
@@ -348,6 +353,37 @@ function deleteLink(link: LinkType) {
     }
 }
 
+
+function selectLink(link) {
+    linkSelectedId.value = link.id
+    cancelSelected() // 取消选中span
+}
+
+function globalClick() {
+    linkSelectedId.value = -1  // 取消选择连接
+    cancelSelected() // 取消选中span
+}
+
+function tabSelected(tabId) {
+    curTabId.value = tabId
+    // 如果连接被选择
+    if (linkSelectedId.value != -1) {
+        let cnt = 0
+        for (let i = 0; i < links.value.length; i++) {
+            for (let j = 0; j < links.value[i].length; j++) {
+                // 找到对应的连接
+                if (linkSelectedId.value == links.value[i][j].id && links.value[i][j].relType != tabId + 1)
+                    links.value[i][j].relType = tabId + 1
+                cnt ++
+            }
+        }
+        // 设保存状态为false
+        saved.value = false
+        linkSelectedId.value = -1
+    }
+}
+
+
 const sleep = (milliseconds) => {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
@@ -383,6 +419,7 @@ async function updateConv(shift: number) {
         relFlag = true
         await initRelships()
 
+        linkSelectedId.value = -1
         targets.value = []
         saved.value = true
         doAction.value = false
@@ -469,16 +506,17 @@ function hideModal() {
 </script>
 
 <template>
-    <div class="main-panel">
+    <div class="main-panel"  @click="globalClick">
     
-    <h1>{{ header }}</h1>
+        <h1>{{ header }}</h1>
+
         <LinkTabs             
             v-for="tab in tabs" 
             :key="tab.id" 
             :tab="tab"
             :cur-tab-id=curTabId
             :class="curTabId === tab.id ? 'active': ''" 
-            @click="curTabId = tab.id">
+            @click="tabSelected(tab.id)">
             
         </LinkTabs>
         
@@ -488,12 +526,12 @@ function hideModal() {
 
         <SpanBtn v-for="item in utterance.items" :key="item.id" :item="item" ref="words"
             :is-selected="utterance.id + '-' + item.id === selectedId"
-            @click="selectAndLink(utterance.id, item.id, $event.target)" @keyup.esc="cancelSelected">
+            @click.stop="selectAndLink(utterance.id, item.id, $event.target)" @keyup.esc="cancelSelected">
         </SpanBtn>
 
         </div>
 
-        <DepLinkDraw :links=links @delete-link="deleteLink" :tabs="tabs"></DepLinkDraw>
+        <DepLinkDraw :links=links @delete-link="deleteLink" @select-link="selectLink" :tabs="tabs" :linkSelectedId="linkSelectedId"></DepLinkDraw>
 
         </div>
     </div>

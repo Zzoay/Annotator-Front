@@ -123,7 +123,7 @@ const cancelY = computed(() => {
             cursor="pointer"
             :cx=cancelCircleX 
             :cy=cancelCircleY 
-            @click="$emit('deleteLink')"
+            @click.stop="$emit('deleteLink')"
         />
 
         <text 
@@ -133,7 +133,7 @@ const cancelY = computed(() => {
             :x=cancelX 
             :y=cancelY 
             :fill="tagHover ? linkStroke: 'none'"
-            @click="$emit('deleteLink')"
+            @click.stop="$emit('deleteLink')"
         >
             x
         </text>

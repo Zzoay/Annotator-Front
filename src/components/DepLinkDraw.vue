@@ -8,9 +8,11 @@ import {LinkType, TabType} from '../types/ConvDepTypes'
 defineProps<{ 
     links: Array<Array<LinkType>>,
     tabs: Array<TabType>,
+    linkSelectedId: number,
 }>()
 defineEmits<{
     (e: 'deleteLink', link: LinkType): void
+    (e: 'selectLink', link: LinkType): void
 }>()
 </script>
 
@@ -23,7 +25,7 @@ defineEmits<{
             v-for="link in links.flat()" 
             :key="link.id" 
             :link="link" 
-            :link-stroke="tabs[link.relType - 1].linkColor"  
+            :link-stroke="linkSelectedId == link.id ? tabs[link.relType - 1].linkColor + '70' : tabs[link.relType - 1].linkColor"  
         >
         </component>
     </svg>
@@ -33,9 +35,10 @@ defineEmits<{
             v-for="link in links.flat()" 
             :key="link.id" 
             :link="link" 
-            :link-stroke="tabs[link.relType - 1].linkColor" 
+            :link-stroke="linkSelectedId == link.id ? tabs[link.relType - 1].linkColor + '70' : tabs[link.relType - 1].linkColor" 
             :tag-name="tabs[link.relType - 1].name"
             @delete-link="$emit('deleteLink', link)"
+            @click.stop="$emit('selectLink', link)"
         >
         </DepLinkTag>
     </svg>
