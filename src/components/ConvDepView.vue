@@ -4,6 +4,7 @@ import LinkTabs from './LinkTabs.vue'
 import SpanBtn from './SpanBtn.vue'
 import DepLinkDraw from './DepLinkDraw.vue'
 import Dialog from './Dialog.vue'
+import Message from './Message.vue'
 import { UteranceType, LinkType, TabType, RelshipType } from '../types/ConvDepTypes'
 import {getRelation, getConv, updateConvTagged, getConvId, getRelationship, postRelationship, deleteRelationship} from '../api/api'
 
@@ -484,6 +485,23 @@ async function saveLinks() {
 
     saveConvTagged()
     saved.value = true
+
+    showMessage("保存成功") 
+}
+
+const showSaveMessage = ref(false)
+const massage = ref('')
+
+function showMessage(message) {
+    showSaveMessage.value = true
+    massage.value = message
+    setTimeout(() => {
+      showSaveMessage.value = false
+    }, 800)
+}
+
+function hideMessage() {
+    showSaveMessage.value = false
 }
 
 function cofirmAction(func, args = null) {  // ? 如何传递数组参数，类似于Python的*args
@@ -516,7 +534,7 @@ function hideModal() {
             :tab="tab"
             :cur-tab-id=curTabId
             :class="curTabId === tab.id ? 'active': ''" 
-            @click="tabSelected(tab.id)">
+            @click.stop="tabSelected(tab.id)">
             
         </LinkTabs>
         
@@ -545,8 +563,13 @@ function hideModal() {
 
     <Dialog :showModal="showModal" :nextPrev="nextPrev" @hide-modal="hideModal" @doAction="doAction=true; cofirmAction(action, actionArgs);"> 
         <template #title>确认</template>
-            确认<strong>&ensp;{{dialogBody}}&ensp;</strong>吗？
+        确认<strong>&ensp;{{dialogBody}}&ensp;</strong>吗？
     </Dialog>
+
+    <Message :showMessage="showSaveMessage" @hide-message="hideMessage"> 
+        <template #title>消息</template>
+        {{massage}}
+    </Message>
 
 </template>
 
