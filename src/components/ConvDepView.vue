@@ -24,7 +24,8 @@ function initRelations() {
 }
 
 let convId = ref(0)
-const convs: Array<UteranceType> = reactive([])
+const conversation = ref<Array<UteranceType>>([])
+// const conversation:Array<UteranceType> = reactive([])
 function saveConvTagged() {
     updateConvTagged(convId.value, true)
 }
@@ -48,7 +49,7 @@ async function init() {
     await getConv(convId.value).then((response: any) => {
         let res = response.data
         for (let i = 0; i < res.length; i++) {
-            convs[i] = res[i]
+            conversation.value.push(res[i])
         }
     })
     initRelships()
@@ -66,6 +67,7 @@ const levelHigh = 25  // 单层高度
 const targets = ref([])
 let tmp = []
 const utrDom = (el) => {
+    if (!el) return 
     let childs = el.childNodes
     for (let i = 0; i < childs.length; i++){
         if (childs[i].nodeName == '#text') {
@@ -276,7 +278,6 @@ function schedule(start: number[], end: number[], startId: string, endId: string
         }
         links.value.push([item])
     }
-    // console.log(this.links)
     selectedId.value = ""
     start = []
     end = []
@@ -400,21 +401,26 @@ async function updateConv(shift: number) {
     if (saved.value || doAction.value) {
         convId.value = convId.value + shift
 
-        // 清空连接
-        cleanLinks()
-        relships.value = []
-    
-        console.log(convId.value)   
+        let res = [{}]
         await getConv(convId.value).then((response: any) => {
-            let res = response.data
+            res = response.data
             if (res.length == 0) {
                 alert("已经没有更多数据了")
                 convId.value = convId.value - shift 
             }
-            for (let i = 0; i < res.length; i++) {
-                convs[i] = res[i]
-            }
         })
+
+        if (res.length == 0) return
+
+        // 清空连接
+        await cleanLinks()
+        relships.value = []
+
+        function assignConv() {
+            // @ts-ignore 
+            conversation.value = res
+        }
+        await assignConv()
 
         // 更新连接
         relFlag = true
@@ -540,7 +546,7 @@ function hideModal() {
         
         <div class="words-view">
 
-        <div :class="'utterance ' + utterance.id" v-for="utterance in convs" :key="utterance.id" :ref="utrDom">
+        <div :class="'utterance ' + utterance.id" v-for="utterance in conversation" :key="utterance.id" :ref="utrDom">
 
         <SpanBtn v-for="item in utterance.items" :key="item.id" :item="item" ref="words"
             :is-selected="utterance.id + '-' + item.id === selectedId"
