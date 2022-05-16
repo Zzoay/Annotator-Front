@@ -6,4 +6,11 @@ import 'bootstrap/dist/js/bootstrap.min'
 
 import '../src/assets/css/globalVariable.css'
 
-createApp(App).mount('#app')
+import router from './router/index'
+
+
+const app = createApp(App)
+
+app.use(router)
+
+app.mount('#app')
