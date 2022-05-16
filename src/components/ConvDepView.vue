@@ -7,6 +7,8 @@ import Dialog from './Dialog.vue'
 import Message from './Message.vue'
 import { UteranceType, LinkType, TabType, RelshipType } from '../types/ConvDepTypes'
 import {getRelation, getConv, updateConvTagged, getConvId, getRelationship, postRelationship, deleteRelationship} from '../api/api'
+import bus from '../libs/bus'
+
 
 
 // data ------------>
@@ -122,6 +124,25 @@ const linkSelectedId = ref(-1)  // 被选中的连接的ID
 
 const { proxy } = (getCurrentInstance() as ComponentInternalInstance)
 console.log('getCurrentInstance()中的proxy:', proxy)
+
+
+// 全局键盘事件
+document.addEventListener("keydown", function(e) {
+    // S
+    if (e.key == "s") {
+        saveLinks()
+    }
+    // C
+    else if (e.key == "c") {
+        cancelLinks()
+    }
+    // Enter
+    else if (e.key == "Enter") {
+    }
+})
+
+// 启用监听
+bus.on('tabSelected', tabSelected)
 // <----------------
 
 
@@ -530,11 +551,10 @@ function hideModal() {
 </script>
 
 <template>
-    <div class="main-panel"  @click="globalClick">
-    
-        <h1>{{ header }}</h1>
+    <div class="main-panel"  @click="globalClick" @select-link="selectLink">
+        <h3>{{ header }}</h3>
 
-        <LinkTabs             
+        <!-- <LinkTabs             
             v-for="tab in tabs" 
             :key="tab.id" 
             :tab="tab"
@@ -542,7 +562,7 @@ function hideModal() {
             :class="curTabId === tab.id ? 'active': ''" 
             @click.stop="tabSelected(tab.id)">
             
-        </LinkTabs>
+        </LinkTabs> -->
         
         <div class="words-view">
 
@@ -583,13 +603,11 @@ function hideModal() {
  .main-panel {
     position: relative;
     background: #fff;
-    padding: 2rem;
-    margin: 1rem;
-    /* margin: 80px 0px 0px 0px; */
-    border-radius: 3px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.12), 0 2px 4px 0 rgba(0, 0, 0, 0.08);
-    width: 100%;
+    padding: 5px;
+    margin: 20px 0px 0px 0px;
+    width: auto;
   }
+  
   h1 {
       margin: 0px 0px 20px 0px;
   }
@@ -598,7 +616,7 @@ function hideModal() {
     display: block;
     align-items: stretch;
     list-style: none;
-    margin: 20px 0px 20px 0px;
+    margin: 0px 0px 20px 0px;
     padding: 20px 0px 20px 0px;
     width: 1000px;
     min-height: 400px;

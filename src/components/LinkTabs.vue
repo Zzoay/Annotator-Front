@@ -32,7 +32,7 @@ const color = computed(() => {
 .btn {
     background-color: #fff;
     padding: 2px 4px;
-    margin: 8px;
+    margin: 6px;
 }
 
 .btn.btn-outline-secondary:hover {

@@ -27,7 +27,13 @@ defineProps<{
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" @click="$emit('hide-modal')">取消</button>
-                        <button type="button" class="btn " :class="nextPrev ? 'btn-warning' : 'btn-primary' " @click="$emit('do-action')">确定</button>
+                        <button type="button" 
+                                class="btn " 
+                                :class="nextPrev ? 'btn-warning' : 'btn-primary' " 
+                                @click="$emit('do-action')"
+                                @keyup.enter.prevent="$emit('do-action')">
+                            确定
+                        </button>
                     </div>
                 </div>
             </div>
