@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import {ref, computed} from "vue"
-import {LinkType} from "../types/ConvDepTypes"
+import {LinkType} from "@/types/ConvDepTypes"
 
 
 const props = defineProps<{ 

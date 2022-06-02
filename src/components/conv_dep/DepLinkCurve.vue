@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {LinkType} from "../types/ConvDepTypes"
+import {LinkType} from "@/types/ConvDepTypes"
 
 
 defineProps<{ 

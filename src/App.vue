@@ -10,13 +10,11 @@ const route = useRoute();
 <template>
   <Home v-if="route.name === 'home'" />
   <AnnotView v-if="route.name === 'conv_annot'"></AnnotView>
-
-  <router-link to="/conv_annot">对话依存标注</router-link>
 </template>
 
 <style>
 body {
-    background: #eff8ff;
+    background: #eff8fff9;
     height: 100vh;
     width: 100vw;
     font-family: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI, Roboto,

@@ -3,7 +3,7 @@ import {reactive, ref} from 'vue'
 
 import Nav from './Nav.vue'
 import SideBar from './SideBar.vue'
-import ConvDepView from './ConvDepView.vue'
+import ConvDepView from '@/components/conv_dep/ConvDepView.vue'
 
 const curTabId = ref(0)
 const tabs = reactive([])

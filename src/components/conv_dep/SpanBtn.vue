@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import {computed} from "vue"
-import { ItemType } from "../types/ConvDepTypes"
+import { ItemType } from "@/types/ConvDepTypes"
 
 
 const props = defineProps<{ 

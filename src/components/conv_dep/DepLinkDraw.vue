@@ -2,7 +2,7 @@
 import DepLinkTag from './DepLinkTag.vue'
 import DepLinkPolyline from './DepLinkPolyline.vue'
 import DepLinkCurve from './DepLinkCurve.vue'
-import {LinkType, TabType} from '../types/ConvDepTypes'
+import {LinkType, TabType} from '@/types/ConvDepTypes'
 
 
 defineProps<{ 

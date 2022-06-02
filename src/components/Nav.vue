@@ -4,7 +4,19 @@
     <a class="navbar-brand" href="#">&nbsp; 标注平台</a>
     <ul class="navbar-nav">
         <li class="nav-item active">
-        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            <router-link
+                to="/home"
+                custom
+                v-slot="{ navigate }"
+                >
+                <a
+                class="nav-link"
+                href=""
+                @click="navigate"
+                >
+                Home
+                </a>
+            </router-link>
         </li>
         <li class="nav-item">
         <a class="nav-link" href="#">Features</a>

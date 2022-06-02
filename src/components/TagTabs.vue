@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import {computed} from 'vue'
-import { TabType } from '../types/ConvDepTypes'
+import { TabType } from '@/types/ConvDepTypes'
 
 
 const props = defineProps<{ 

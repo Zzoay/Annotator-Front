@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {reactive, ref} from 'vue'
-import {TabType } from '../types/ConvDepTypes'
-import {getRelation} from '../api/api'
+import {TabType } from '@/types/ConvDepTypes'
+import {getRelation} from '@/api/api'
 
-import bus from '../libs/bus'
-import LinkTabs from './LinkTabs.vue'
+import bus from '@/libs/bus'
+import LinkTabs from './TagTabs.vue'
 
 
 const curTabId = ref(0)
