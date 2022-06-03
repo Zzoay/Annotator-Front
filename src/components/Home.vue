@@ -15,7 +15,7 @@ const cards = reactive([
         title: "对话依存分析",
         content: "本任务旨在对对话级别的文本数据进行语义依存标注，包括对头尾词语和其中关系标签的标注。",
         img_src: img_srcs[0],
-        to: "/conv_annot",
+        to: "/conv_data",
     },
     {
         id: 2,
@@ -66,7 +66,6 @@ const cards = reactive([
     height: 80px;   
     overflow: hidden;
     text-overflow: ellipsis;
-
 }
 
 </style>

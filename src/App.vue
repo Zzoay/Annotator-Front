@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AnnotView from './components/AnnotView.vue'
+import DataView from './components/DataView.vue'
 import Home from './components/Home.vue';
 
 import { useRoute } from 'vue-router'
@@ -9,6 +10,7 @@ const route = useRoute();
 
 <template>
   <Home v-if="route.name === 'home'" />
+  <DataView v-if="route.name === 'conv_data'"></DataView>
   <AnnotView v-if="route.name === 'conv_annot'"></AnnotView>
 </template>
 
