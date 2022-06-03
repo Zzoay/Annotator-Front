@@ -34,16 +34,12 @@ init()
 
 <template>
     <!-- <h5 class="title"> 对话依存分析  </h5> -->
-    <div class="box">
-        <div class="title">任务：对话依存分析 </div>
-        <div class="statics">已标注/总计：1/550</div>
-    </div>
     <div class="table-view">
     <table class="table table-hover">
         <thead class="thead table-light">
         <tr>
             <th scope="col">索引</th>
-            <th scope="col">文本</th>
+            <th scope="col">数据</th>
             <th scope="col">状态</th>
             <th scope="col"></th>
         </tr>
@@ -53,18 +49,18 @@ init()
             <th scope="row">1</th>
             <td>Mark</td>
             <td>Otto</td>
-            <td>@mdo</td>
+            <td><router-link to="" class="router-link">标注</router-link></td>
             </tr>
             <tr>
             <th scope="row">2</th>
             <td class="col-text">Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob JacobJacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob JacobJacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob JacobJacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob JacobJacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob JacobJacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob Jacob</td>
             <td>Thornton</td>
-            <td>@fat</td>
+            <td><router-link to="" class="router-link">标注</router-link></td>
             </tr>
             <tr>
             <th scope="row">3</th>
             <td colspan="2">Larry the Bird</td>
-            <td>@twitter</td>
+            <td ><router-link to="" class="router-link">标注</router-link></td>
             </tr>
         </tbody>
     </table>
@@ -72,24 +68,7 @@ init()
 </template>
 
 
-<style>
-.box {
-    display: block;
-    width: 100%;
-    height: 100%;
-    padding: 30px;
-    /* margin: 10px 0px 0px 10px; */
-}
- 
-.title {
-    float: left;
-}
-
-.statics {
-    float: right;
-    margin-right: 20px;
-}
-
+<style scoped>
 .table-view {
     display: block;
     margin: 20px 10px 2px 10px;
@@ -111,4 +90,10 @@ init()
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+.link {
+    text-decoration: none;
+    color: #09585d;
+}
+
 </style>

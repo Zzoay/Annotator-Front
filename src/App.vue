@@ -2,6 +2,7 @@
 import AnnotView from './components/AnnotView.vue'
 import DataView from './components/DataView.vue'
 import Home from './components/Home.vue';
+import TaskAssign from './components/TaskAssign.vue';
 
 import { useRoute } from 'vue-router'
 
@@ -12,6 +13,7 @@ const route = useRoute();
   <Home v-if="route.name === 'home'" />
   <DataView v-if="route.name === 'conv_data'"></DataView>
   <AnnotView v-if="route.name === 'conv_annot'"></AnnotView>
+  <TaskAssign v-if="route.name === 'task_assign'"></TaskAssign>
 </template>
 
 <style>
@@ -27,5 +29,15 @@ body {
     margin: 0;
     padding: 0;
   }
+
+.router-link {
+  text-decoration: none;
+  color: #356dc9;
+}
+
+.router-link:hover {
+  text-decoration: none;
+  color: #144dab;
+}
 
 </style>

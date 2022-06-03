@@ -15,7 +15,7 @@ const cards = reactive([
         title: "对话依存分析",
         content: "本任务旨在对对话级别的文本数据进行语义依存标注，包括对头尾词语和其中关系标签的标注。",
         img_src: img_srcs[0],
-        to: "/conv_data",
+        to: "/task_assign",
     },
     {
         id: 2,
@@ -35,12 +35,12 @@ const cards = reactive([
 
 <div class="main-view">
     <div class = "row">
-    <div v-for="card in cards" :key="card.id" class="card" style="width: 18rem;">
+    <div v-for="card in cards" :key="card.id" class="card">
         <img class="card-img-top" :src="card.img_src" alt="Card image cap">
         <div class="card-body">
             <h5 class="card-title"><b> {{card.title}} </b></h5>
             <p class="card-text">{{card.content}}</p>
-            <router-link :to="card.to" class="card-link">进入</router-link>
+            <router-link :to="card.to" class="router-link">进入</router-link>
         </div>
     </div>
     </div>
@@ -48,7 +48,7 @@ const cards = reactive([
 
 </template>
 
-<style>
+<style scoped>
 
 .main-view {
     display: block;
@@ -59,6 +59,7 @@ const cards = reactive([
 .card {
     margin: 10px 15px 10px 10px;
     padding: 5px;
+    width: 18rem;
 }
 
 .card-text {
@@ -66,6 +67,10 @@ const cards = reactive([
     height: 80px;   
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.router-link {
+    margin: 2px 15px 2px 5px;
 }
 
 </style>

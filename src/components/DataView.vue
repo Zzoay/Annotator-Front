@@ -15,9 +15,28 @@ function tabSelected(tabId: number) {
 
 <template>
   <Nav></Nav>
+    <div class="box">
+        <div class="title">任务：对话依存分析 </div>
+        <div class="statics">已标注/总计：1/550</div>
+    </div>
   <ConvDataView> </ConvDataView>
 </template>
 
-<style>
+<style scoped>
+.box {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 30px;
+    /* margin: 10px 0px 0px 10px; */
+}
+ 
+.title {
+    float: left;
+}
 
+.statics {
+    float: right;
+    margin-right: 20px;
+}
 </style>
