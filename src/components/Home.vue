@@ -4,8 +4,8 @@ import Nav from './Nav.vue'
 import SideBar from './SideBar.vue'
 
 const img_srcs = [
-    "https://mixkit.imgix.net/art/preview/mixkit-two-flamingos-standing-in-the-water-438-square-medium.png?q=80&auto=format%2Ccompress",
-    "https://mixkit.imgix.net/art/preview/mixkit-jungle-animals-collage-featuring-a-jaguar-caiman-and-eagle-436-square-medium.png?q=80&auto=format%2Ccompress",
+    "public/mixkit-two-flamingos-standing-in-the-water-438-square-medium.webp",
+    "public/mixkit-jungle-animals-collage-featuring-a-jaguar-caiman-and-eagle-436-square-medium.webp",
 ]
 
 
@@ -31,7 +31,7 @@ const cards = reactive([
 
 <template>
 
-<Nav></Nav>
+<Nav page-now="/home"></Nav>
 
 <div class="main-view">
     <div class = "row">

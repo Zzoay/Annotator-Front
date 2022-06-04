@@ -13,13 +13,13 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import(/* webpackChunkName: "conv_annotation" */ '../components/TaskAssign.vue')
     },
     {
-        path: '/conv_annot',
-        name: 'conv_annot',
+        path: '/annot',
+        name: 'annot',
         component: () => import(/* webpackChunkName: "conv_annotation" */ '../components/AnnotView.vue')
     },
     {
-        path: '/conv_data',
-        name: 'conv_data',
+        path: '/data',
+        name: 'data',
         component: () => import(/* webpackChunkName: "conv_annotation" */ '../components/DataView.vue')
     }
 ]

@@ -5,16 +5,10 @@ import Nav from './Nav.vue'
 import SideBar from './SideBar.vue'
 import ConvDepView from '@/components/conv_dep/ConvDepView.vue'
 
-const curTabId = ref(0)
-const tabs = reactive([])
-
-function tabSelected(tabId: number) {
-    console.log(tabId)
-}
 </script>
 
 <template>
-  <Nav></Nav>
+  <Nav page-now="/annot"></Nav>
   <div class="row">
     <div class="col">
         <SideBar> </SideBar>

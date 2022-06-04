@@ -11,8 +11,8 @@ const route = useRoute();
 
 <template>
   <Home v-if="route.name === 'home'" />
-  <DataView v-if="route.name === 'conv_data'"></DataView>
-  <AnnotView v-if="route.name === 'conv_annot'"></AnnotView>
+  <DataView v-if="route.name === 'data'"></DataView>
+  <AnnotView v-if="route.name === 'annot'"></AnnotView>
   <TaskAssign v-if="route.name === 'task_assign'"></TaskAssign>
 </template>
 

@@ -7,7 +7,7 @@ const cards = reactive([
     {
         id: 1,
         content: "- 0/100",
-        to: "/conv_data",
+        to: "/data",
     },
     {
         id: 2,
@@ -21,7 +21,7 @@ const cards = reactive([
 
 <template>
 
-<Nav></Nav>
+<Nav page-now="/task_assign"></Nav>
 
 <div class="main-view">
     <div class = "row">
