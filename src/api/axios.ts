@@ -1,50 +1,85 @@
-import axios from 'axios';
-import { showMessage } from "./status";   // 引入状态码文件
-// import { ElMessage } from 'element-plus'  // 引入el 提示框，这个项目里用什么组件库这里引什么
+import axios, { AxiosResponse } from 'axios';
+import {ElMessage} from "element-plus";
+// import { showMessage } from "./status";   // 引入状态码文件
+import { getCookie } from "../utils";
+import router from "../router"
+
 
 // 设置接口超时时间
 axios.defaults.timeout = 60000;
 
-// 请求地址，这里是动态赋值的的环境变量，下一篇会细讲，这里跳过
 // @ts-ignore
 axios.defaults.baseURL = import.meta.env.VITE_API_DOMAIN;   
 
-//http request 拦截器
-// axios.interceptors.request.use(
-//   config => {
-//   // 配置请求头
-//     config.headers = {
-//       //'Content-Type':'application/x-www-form-urlencoded',   // 传参方式表单
-//       'Content-Type':'application/json;charset=UTF-8',        // 传参方式json
-//       'token':'80c483d59ca86ad0393cf8a98416e2a1'              // 这里自定义配置，这里传的是token
-//     };
-//     return config;
-//   },
-//   error => {
-//     return Promise.reject(error);
-//   }
-// );
+// http request 拦截器
+axios.interceptors.request.use(
+  config => {
+  // 配置请求头
+    config.headers = {
+      'X-CSRFToken': getCookie('csrftoken')
+    };
+    return config
+  },
+  error => {
+    return Promise.reject(error)
+  }
+)
 
-//http response 拦截器
-// axios.interceptors.response.use(
-//   response => {
-//     return response;
-//   },
-//   error => {
-//     const {response} = error;
-//     if (response) {
-//       // 请求已发出，但是不在2xx的范围
-//       showMessage(response.status);           // 传入响应码，匹配响应码对应信息
-//       return Promise.reject(response.data);
-//     } else {
-//     //   ElMessage.warning('网络连接异常,请稍后再试!');
-//         alert('网络连接异常,请稍后再试!')
-//     }
-//   }
-// );
+// http response 拦截器
+axios.interceptors.response.use(
+  (response: AxiosResponse) => {
+    const data = response.data
+    // console.log('response => ', response)
+    if (data.status === '403') {
+        localStorage.removeItem('user');
+        ElMessage({
+            message: data.error,
+            type: 'error',
+            duration: 1.5 * 1000
+        })
+        return router.push('/login')
+    } else if (data.status === 'error') {
+        ElMessage({
+            message: data.error || data.status,
+            type: 'error',
+            duration: 1.5 * 1000
+        })
+    }
+
+    if (data.success === false && data.msg) {
+        ElMessage({
+            message: data.msg,
+            type: 'error',
+            duration: 1.5 * 1000
+        })
+    }
+    return data
+},
+({message, response}) => {
+    // console.log('err => ', message, response) // for debug
+    if (response && response.data && response.data.detail) {
+        ElMessage({
+            message: response.data.detail,
+            type: 'error',
+            duration: 2 * 1000
+        })
+    } else {
+        ElMessage({
+            message: message,
+            type: 'error',
+            duration: 2 * 1000
+        })
+    }
+    if (response && (response.status === 403 || response.status === 401)) {
+        localStorage.removeItem('user')
+        router.push('/login')
+        // return router.push('/login')
+    }
+    return Promise.reject(message)
+})
 
 // 封装 GET POST 请求并导出
-export function request(url='',params={},type='POST'){
+export function request(url='', params={}, type='POST'){
 //设置 url params type 的默认值
 return new Promise((resolve,reject)=>{
   let promise

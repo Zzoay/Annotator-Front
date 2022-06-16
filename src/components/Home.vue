@@ -4,8 +4,8 @@ import Nav from './Nav.vue'
 import SideBar from './SideBar.vue'
 
 const img_srcs = [
-    "public/mixkit-two-flamingos-standing-in-the-water-438-square-medium.webp",
-    "public/mixkit-jungle-animals-collage-featuring-a-jaguar-caiman-and-eagle-436-square-medium.webp",
+    "/mixkit-two-flamingos-standing-in-the-water-438-square-medium.webp",
+    "/mixkit-jungle-animals-collage-featuring-a-jaguar-caiman-and-eagle-436-square-medium.webp",
 ]
 
 
