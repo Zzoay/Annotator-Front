@@ -4,7 +4,7 @@
 import { defineComponent, reactive } from "vue";
 import Cookies from 'js-cookie'
 import { login } from "../api/api";
-import { SET_USER } from "../store";
+import { SET_USER, CLEAR_USER } from "../store";
 import { User } from "../types/common";
 
 import Nav from './Nav.vue'
@@ -101,88 +101,110 @@ export default defineComponent({
             this.state.loading = false;
           }
         }
-      });
+      })
     },
   },
-});
+})
 </script>
 
 <template>
 <Nav page-now="/login"></Nav>
 
 <div class="main-panel">
-<div class="cover">
-    <img src="/grass.png" alt="Card image cap" width="300" height="500">
-</div>
-<div class="login-container">
-    <el-form
-      ref="loginForm"
-      :model="state.loginForm"
-      autocomplete="on"
-      class="login-form"
-      label-position="left"
-      @keyup.enter="handleLogin"
-    >
-      <div class="title-container">
-        <h4 class="title">登录</h4>
-      </div>
 
-      <el-form-item prop="account">
-        <el-input
-          ref="account"
-          v-model="state.loginForm.account"
-          autocomplete="on"
-          name="account"
-          placeholder="用户名"
-          tabindex="1"
-          type="text"
-        />
-      </el-form-item>
+<div class="row align-items-center">
+    <div class="col">
+        <div class="cover">
+            <img src="/grass.png" alt="Card image cap" width="300" height="500">
+        </div>
+    </div>
 
-      <!-- <el-tooltip
-        v-model="state.capsTooltip"
-        content="大写锁定已打开"
-        manual
-        placement="right"
-      > -->
-        <el-form-item prop="password">
-          <el-input
-            :key="state.passwordType"
-            ref="password"
-            v-model="state.loginForm.password"
-            :type="state.passwordType"
+    <div class="col">
+        <div class="login-container">
+        <el-form
+        ref="loginForm"
+        :model="state.loginForm"
+        autocomplete="on"
+        class="login-form"
+        label-position="left"
+        @keyup.enter="handleLogin"
+        >
+        <div class="title-container">
+            <h4 class="title">登录</h4>
+        </div>
+
+        <el-form-item prop="account">
+            <el-input
+            ref="account"
+            v-model="state.loginForm.account"
             autocomplete="on"
-            name="password"
-            placeholder="密码"
-            tabindex="2"
-            @keyup="checkCapslock"
-          />
+            name="account"
+            placeholder="用户名"
+            tabindex="1"
+            type="text"
+            />
         </el-form-item>
-      <!-- </el-tooltip> -->
 
-      <el-button
-        :loading="state.loading"
-        style="width: 100%; margin-bottom: 30px"
-        type="primary"
-        @click="handleLogin"
-      >
-        登录
-      </el-button>
-    </el-form>
-  </div>
+        <!-- <el-tooltip
+            v-model="state.capsTooltip"
+            content="大写锁定已打开"
+            manual
+            placement="right"
+        > -->
+            <el-form-item prop="password">
+            <el-input
+                :key="state.passwordType"
+                ref="password"
+                v-model="state.loginForm.password"
+                :type="state.passwordType"
+                autocomplete="on"
+                name="password"
+                placeholder="密码"
+                tabindex="2"
+                @keyup="checkCapslock"
+            />
+            </el-form-item>
+        <!-- </el-tooltip> -->
+
+        <el-button
+            :loading="state.loading"
+            style="width: 100%; margin-bottom: 30px"
+            type="primary"
+            @click="handleLogin"
+        >
+            登录
+        </el-button>
+        </el-form>
+        </div>
+    </div>
+    
+</div>
+
 </div>
 </template>
 
 
 <style lang="css" scoped>
 .main-panel {
-    height: 100%;
-    padding: 350px 400px 0 420px;
+    height: 100vh;
     width: 100%;
     overflow: hidden;
 }
+
+.row {
+    height: 100% !important;
+    width: 100% !important; 
+}
+
+.col {
+    /* height: 100%; */
+    margin: 0 0 20vh 0;
+    width: 100%;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+}
 .cover {
-    margin-top: -150px;
     float: left;
 }
 
@@ -194,15 +216,16 @@ export default defineComponent({
 }
 
 .login-form {
-  width: 300px;
+  min-height: 260px;
+  min-width: 200px;
+  height: 28vh;
+  width: 20vw;
   max-width: 100%;
   overflow: hidden;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-  height: 350px;
+  margin: 0 20vw 0 0;
+  padding: 50px;
+  border: 1px solid rgb(60, 70, 136);
+  border-radius: 4px;
 }
 
 /* .tips {
@@ -230,7 +253,7 @@ export default defineComponent({
 
 .title-container .title {
   /* font-size: 40px; */
-  margin: 0px auto 20px 10px;
+  margin: 0px auto 25px 10px;
   /* text-align: center; */
   font-weight: bold;
 }

@@ -38,6 +38,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     const userInfo = window.sessionStorage.userInfo
     if (to.name !== 'login' && (!userInfo || userInfo === '{}')) next({name: 'login'})
+    else if (to.name === 'login' && userInfo) next({name: 'home'})
     else next()
 })
 

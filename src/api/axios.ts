@@ -30,7 +30,7 @@ axios.interceptors.response.use(
   (response: AxiosResponse) => {
     const data = response.data
     // console.log('response => ', response)
-    if (data.status === '403') {
+    if (data.status === '401') {
         localStorage.removeItem('user');
         ElMessage({
             message: data.error,

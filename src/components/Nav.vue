@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import {reactive, ref} from 'vue'
+import {reactive, ref, getCurrentInstance, ComponentInternalInstance} from 'vue'
+import { SET_USER, CLEAR_USER } from "../store";
+
 
 const props = defineProps<{ 
     pageNow: string,
@@ -13,6 +15,18 @@ const pages = ref({
     '/annot': 3,
 })
 
+const { proxy } = (getCurrentInstance() as ComponentInternalInstance)
+
+function handleLogout() {
+    // @ts-ignore
+    proxy.$store.commit(CLEAR_USER)
+    window.sessionStorage.userInfo = ""
+    // @ts-ignore
+    proxy.$router.push({
+        path: "/login",
+    })
+}
+
 </script>
 
 <template>
@@ -23,7 +37,7 @@ const pages = ref({
         custom
         v-slot="{ navigate }">
         <div class="icon" @click="navigate"> 
-        <img src="/cube.svg" width="50" height="50" alt="" />
+        <img src="/cube.svg" width="40" height="40" alt="" />
         </div>
     </router-link>
     
@@ -72,11 +86,11 @@ const pages = ref({
     <div class="collapse navbar-collapse justify-content-end">
         <div v-if="pages[pageNow] >= 0" class="nav-item dropdown active">
             <a id="user" class="" href="#" role="button" data-bs-toggle="dropdown">
-                用户
+                <img src="/my.svg" width="20" height="30" alt="" />
             </a>
 
             <ul id='user-down' class="dropdown-menu dropdown-menu-right">
-                <li><a id="exit" class="dropdown-item" href="#">退出</a></li>
+                <li><a id="exit" class="dropdown-item" href="#" @click="handleLogout">退出</a></li>
             </ul>
         </div>
         
