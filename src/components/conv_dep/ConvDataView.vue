@@ -1,12 +1,7 @@
 <script setup lang="ts">
-import {onBeforeMount, onMounted, getCurrentInstance, reactive, ref, ComponentInternalInstance, onBeforeUnmount, watch} from 'vue'
-import SpanBtn from './SpanBtn.vue'
-import DepLinkDraw from './DepLinkDraw.vue'
-import Dialog from './Dialog.vue'
-import Message from './Message.vue'
-import { UteranceType, LinkType, TabType, RelshipType } from '../../types/ConvDepTypes'
-import {getRelation, getConv, updateConvTagged, getConvId, getRelationship, postRelationship, deleteRelationship} from '@/api/api'
-import bus from '@/libs/bus'
+import { ref } from 'vue'
+import { UteranceType } from '../../types/ConvDepTypes'
+import { getConv, getConvId } from '@/api/api'
 
 // data ------------>
 const header = '对话依存分析'

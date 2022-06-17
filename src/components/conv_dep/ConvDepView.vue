@@ -5,9 +5,8 @@ import DepLinkDraw from './DepLinkDraw.vue'
 import Dialog from './Dialog.vue'
 import Message from './Message.vue'
 import { UteranceType, LinkType, TabType, RelshipType } from '../../types/ConvDepTypes'
-import {getRelation, getConv, updateConvTagged, getConvId, getRelationship, postRelationship, deleteRelationship} from '@/api/api'
+import {getRelation, getConv, updateConvStatus, getConvId, getRelationship, postRelationship, deleteRelationship} from '@/api/api'
 import bus from '@/libs/bus'
-
 
 
 // data ------------>
@@ -26,9 +25,9 @@ function initRelations() {
 
 let convId = ref(0)
 const conversation = ref<Array<UteranceType>>([])
-// const conversation:Array<UteranceType> = reactive([])
-function saveConvTagged() {
-    updateConvTagged(convId.value, true)
+
+function saveConvStatus() {
+    updateConvStatus(convId.value, 1)
 }
 
 const relships = ref<Array<RelshipType>>([]) 
@@ -509,7 +508,7 @@ async function saveLinks() {
     }
     initRelships()
 
-    saveConvTagged()
+    saveConvStatus()
     saved.value = true
 
     showMessage("保存成功") 

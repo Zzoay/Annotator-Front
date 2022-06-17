@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {reactive} from 'vue'
+import {reactive, getCurrentInstance, ComponentInternalInstance} from 'vue'
 import Nav from './Nav.vue'
 
 
@@ -16,6 +16,10 @@ const cards = reactive([
     },
 ])
 
+const { proxy } = (getCurrentInstance() as ComponentInternalInstance)
+
+const userInfo = window.sessionStorage.userInfo
+console.log(userInfo)
 
 </script>
 
