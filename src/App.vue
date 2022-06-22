@@ -24,7 +24,7 @@ body {
     height: 100vh;
     width: 100vw;
     max-width: 100%;
-    overflow: hidden; 
+    /* overflow: hidden;  */
     font-family: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI, Roboto,
       Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
     /* display: flex;

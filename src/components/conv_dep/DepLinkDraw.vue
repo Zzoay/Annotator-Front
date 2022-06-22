@@ -5,7 +5,7 @@ import DepLinkCurve from './DepLinkCurve.vue'
 import {LinkType, TabType} from '@/types/ConvDepTypes'
 
 
-defineProps<{ 
+const props = defineProps<{ 
     links: Array<Array<LinkType>>,
     tabs: Array<TabType>,
     linkSelectedId: number,
@@ -14,6 +14,10 @@ defineEmits<{
     (e: 'deleteLink', link: LinkType): void
     (e: 'selectLink', link: LinkType): void
 }>()
+
+console.log(props.links)
+console.log(props.tabs)
+console.log(props.linkSelectedId)
 </script>
 
 <template>

@@ -11,7 +11,7 @@ const props = defineProps<{
 
 // computed
 const itemColor = computed(() => {
-    return props.item.id == 1 ? '#F19D57' : ''
+    return props.item.id == 0 ? '#F19D57' : ''
 })
 </script>
 

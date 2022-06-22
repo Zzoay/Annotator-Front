@@ -216,10 +216,10 @@ export default defineComponent({
 }
 
 .login-form {
-  min-height: 260px;
-  min-width: 200px;
-  height: 28vh;
-  width: 20vw;
+  /* min-height: 280px;
+  min-width: 200px; */
+  height: 32vh;
+  width: 22vw;
   max-width: 100%;
   overflow: hidden;
   margin: 0 20vw 0 0;

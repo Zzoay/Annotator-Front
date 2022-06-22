@@ -17,11 +17,14 @@ const bgColor = computed(() => {
 const color = computed(() => {
     return props.curTabId == props.tab.id ? '#fff' : props.tab.linkColor
 })
+
+console.log(bgColor)
+console.log(color)
 </script>
 
 <template>
     <button 
-        class="btn" 
+        class="btn"
         :style="{'box-shadow': 'none', 'color':color, 'border-color': tab.linkColor, 'background-color': bgColor}"
     >
     {{tab.name}}
@@ -31,8 +34,8 @@ const color = computed(() => {
 <style scoped>
 .btn {
     background-color: #fff;
-    padding: 2px 4px;
-    margin: 6px;
+    padding: 2px 4px !important;
+    margin: 6px !important;
 }
 
 .btn.btn-outline-secondary:hover {

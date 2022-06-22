@@ -16,7 +16,7 @@ let curTabId = ref(0)
 const tabs: Array<TabType> = reactive([])
 function initRelations() {
     getRelation().then((response: any) => {
-        let res = response.data
+        let res = response.results
         for (let i = 0; i < res.length; i++) {
             tabs[i] = {id: i, name: res[i]['name'], linkColor: "#" + res[i]['color']}
         }
@@ -33,7 +33,7 @@ function saveConvStatus() {
 const relships = ref<Array<RelshipType>>([]) 
 function initRelships() {
     getRelationship(convId.value).then((response: any) => {
-        let res = response.data
+        let res = response
         for (let i = 0; i < res.length; i++) {
             relships.value[i] = res[i]
         }
@@ -43,11 +43,13 @@ function initRelships() {
 async function init() {
     await initRelations()
     await getConvId().then((response: any) => {
-        let res = response.data
+        let res = response
         convId.value = res['conv_id']
+        console.log(convId)
     })
     await getConv(convId.value).then((response: any) => {
-        let res = response.data
+        let res = response
+        console.log(response)
         for (let i = 0; i < res.length; i++) {
             conversation.value.push(res[i])
         }
@@ -545,7 +547,7 @@ function hideModal() {
     dialogBody.value = "操作"
 }
 // <--------------
-
+console.log(tabs)
 </script>
 
 <template>
@@ -566,10 +568,10 @@ function hideModal() {
 
         <div :class="'utterance ' + utterance.id" v-for="utterance in conversation" :key="utterance.id" :ref="utrDom">
 
-        <SpanBtn v-for="item in utterance.items" :key="item.id" :item="item" ref="words"
-            :is-selected="utterance.id + '-' + item.id === selectedId"
-            @click.stop="selectAndLink(utterance.id, item.id, $event.target)" @keyup.esc="cancelSelected">
-        </SpanBtn>
+            <SpanBtn v-for="item in utterance.items" :key="item.id" :item="item" ref="words"
+                :is-selected="utterance.id + '-' + item.id === selectedId"
+                @click.stop="selectAndLink(utterance.id, item.id, $event.target)" @keyup.esc="cancelSelected">
+            </SpanBtn>
 
         </div>
 
@@ -598,6 +600,7 @@ function hideModal() {
 </template>
 
 <style scoped lang="css">
+
  .main-panel {
     position: relative;
     background: #fff;
@@ -606,9 +609,6 @@ function hideModal() {
     width: auto;
   }
   
-  h1 {
-      margin: 0px 0px 20px 0px;
-  }
   .words-view{
     position: relative;
     display: block;
@@ -616,7 +616,7 @@ function hideModal() {
     list-style: none;
     margin: 0px 0px 20px 0px;
     padding: 20px 0px 20px 0px;
-    width: 1000px;
+    width: 95%;
     min-height: 400px;
   }
 
