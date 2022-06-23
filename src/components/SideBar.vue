@@ -15,7 +15,6 @@ function initRelations() {
         for (let i = 0; i < res.length; i++) {
             tabs[i] = {id: i, name: res[i]['name'], linkColor: "#" + res[i]['color']}
         }
-        console.log(tabs)
     })
 }
 

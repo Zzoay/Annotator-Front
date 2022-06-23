@@ -18,8 +18,6 @@ const color = computed(() => {
     return props.curTabId == props.tab.id ? '#fff' : props.tab.linkColor
 })
 
-console.log(bgColor)
-console.log(color)
 </script>
 
 <template>

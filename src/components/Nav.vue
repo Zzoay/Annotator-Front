@@ -5,6 +5,9 @@ import { SET_USER, CLEAR_USER } from "../store";
 
 const props = defineProps<{ 
     pageNow: string,
+        // TODO: 类型定义
+    assigns?: Array<Object>,
+    finish_num?: number
 }>()
 
 const pages = ref({
@@ -24,6 +27,21 @@ function handleLogout() {
     // @ts-ignore
     proxy.$router.push({
         path: "/login",
+    })
+}
+
+// @ts-ignore
+const assigns = props.assigns
+// @ts-ignore
+const finish_num = props.finish_num
+async function routeTo(name) {
+    // @ts-ignore
+    await proxy.$router.push({
+        name: name,
+        params: {
+            'finish_num': JSON.stringify(finish_num), 
+            'assigns': JSON.stringify(assigns)
+        }
     })
 }
 
@@ -76,9 +94,8 @@ function handleLogout() {
         <li v-if="pages[pageNow] > 2" class="nav-item active">
             <router-link
                 to="/data"
-                custom
-                v-slot="{ navigate }">
-                <a class="nav-link" href="" @click="navigate"> 数据 </a>
+                custom>
+                <a class="nav-link" href="#" @click.native="routeTo('data')"> 数据 </a>
             </router-link>
         </li>
     </ul>

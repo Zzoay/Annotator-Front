@@ -107,6 +107,13 @@ return new Promise((resolve,reject)=>{
       data:params
     })
   }
+  else if( type.toUpperCase()=== 'PATCH' ){
+    promise = axios({
+      method:'PATCH',
+      url,
+      data:params
+    })
+  }
   //处理返回
   promise.then(res=>{
     resolve(res)

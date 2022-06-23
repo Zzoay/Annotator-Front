@@ -5,12 +5,22 @@ import DepLinkDraw from './DepLinkDraw.vue'
 import Dialog from './Dialog.vue'
 import Message from './Message.vue'
 import { UteranceType, LinkType, TabType, RelshipType } from '../../types/ConvDepTypes'
-import {getRelation, getConv, updateConvStatus, getConvId, getRelationship, postRelationship, deleteRelationship} from '@/api/api'
+import {getRelation, getConv, updateConvStatus, updateEntryStatus, getRelationship, postRelationship, deleteRelationship} from '@/api/api'
 import bus from '@/libs/bus'
 
 
 // data ------------>
 const header = '对话依存分析'
+
+const props = defineProps<{ 
+    // TODO: 类型定义
+    assigns: Array<Object>,
+    assign_index: number,
+}>()
+
+const emits = defineEmits([
+    'updateAssign'
+])
 
 let curTabId = ref(0)
 const tabs: Array<TabType> = reactive([])
@@ -27,7 +37,8 @@ let convId = ref(0)
 const conversation = ref<Array<UteranceType>>([])
 
 function saveConvStatus() {
-    updateConvStatus(convId.value, 1)
+    updateEntryStatus(convId.value, 2)  // 2 表示完成
+    emits('updateAssign', convId.value)
 }
 
 const relships = ref<Array<RelshipType>>([]) 
@@ -42,14 +53,21 @@ function initRelships() {
 
 async function init() {
     await initRelations()
-    await getConvId().then((response: any) => {
-        let res = response
-        convId.value = res['conv_id']
-        console.log(convId)
-    })
+    // 从任务分配表中找出没标注的第一篇对话
+    for (let i = 0; i < props.assigns.length; i++) {
+        if (props.assign_index) {
+            convId.value = props.assigns[props.assign_index].item_id
+            break 
+        }
+        // @ts-ignore
+        if (props.assigns[i].status === 0) {  // 0 表示没标注
+            // @ts-ignore
+            convId.value = props.assigns[i].item_id
+            break
+        }
+    }
     await getConv(convId.value).then((response: any) => {
         let res = response
-        console.log(response)
         for (let i = 0; i < res.length; i++) {
             conversation.value.push(res[i])
         }
@@ -95,13 +113,14 @@ watch(relships, (newValue, oldValue) => {
             let tailUtr = Number(tailSplit[0])
             let tailWord = Number(tailSplit[1])
 
-            // -1是因为targets从0开始，而我们默认的句子和词语的下标从1开始
-            let start = targets.value[headUtr - 1][headWord - 1] 
-            let end = targets.value[tailUtr - 1][tailWord - 1]
+            console.log(relships)
+            console.log(targets)
+
+            let start = targets.value[headUtr][headWord] 
+            let end = targets.value[tailUtr][tailWord]
             
             // 判断是句内还是跨句
             if (headUtr == tailUtr)
-                // 关系数组从0开始，而我们默认的句子和词语的下标从1开始，这里未对齐，而在DepLinkDraw中，通过-1对齐了
                 schedule(start, end, relships.value[i]['head'], relships.value[i]['tail'], start[1], 1, relships.value[i]['relation']) 
             else
                 linkDiffHigh(start, end, relships.value[i]['head'], relships.value[i]['tail'], relships.value[i]['relation'])
@@ -123,7 +142,6 @@ const actionArgs = ref()  // 操作函数的参数
 const linkSelectedId = ref(-1)  // 被选中的连接的ID
 
 const { proxy } = (getCurrentInstance() as ComponentInternalInstance)
-console.log('getCurrentInstance()中的proxy:', proxy)
 
 
 // 全局键盘事件
@@ -424,7 +442,7 @@ async function updateConv(shift: number) {
 
         let res = [{}]
         await getConv(convId.value).then((response: any) => {
-            res = response.data
+            res = response
             if (res.length == 0) {
                 alert("已经没有更多数据了")
                 convId.value = convId.value - shift 
@@ -510,6 +528,7 @@ async function saveLinks() {
     }
     initRelships()
 
+    // TODO: 在任务分配表中保存状态
     saveConvStatus()
     saved.value = true
 
@@ -547,7 +566,6 @@ function hideModal() {
     dialogBody.value = "操作"
 }
 // <--------------
-console.log(tabs)
 </script>
 
 <template>

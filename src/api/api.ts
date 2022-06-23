@@ -9,6 +9,18 @@ export function logout() {
     return request('http://localhost:8000/api/user/logout', '', 'get')
 }
 
+export function getProcess(userId) {
+    return request('http://localhost:8000/api/process/', {'userId': userId}, 'get')
+}
+
+export function getProcessAssign(processId) {
+    return request('http://localhost:8000/api/process_assign/', {'processId': processId}, 'get')
+}
+
+export function updateEntryStatus(assignId, status) {
+    return request('http://localhost:8000/api/process_assign/' + assignId + '/', {'id': assignId, 'status': status}, 'patch')
+}
+
 export function getConv(convId) {
     return request('http://localhost:8000/api/conv_dep/', {'convId': convId}, 'get')
 }

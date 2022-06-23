@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import {reactive, getCurrentInstance, ComponentInternalInstance} from 'vue'
+import {ref, reactive, getCurrentInstance, ComponentInternalInstance} from 'vue'
+import {getProcess, getProcessAssign} from '@/api/api'
 import Nav from './Nav.vue'
 
 
@@ -12,15 +13,59 @@ const cards = reactive([
     {
         id: 2,
         content: "- 0/100",
-        to: "/home",
+        to: "/data",
     },
 ])
 
+const userInfo = JSON.parse(window.sessionStorage.userInfo)
+
+const processIds = reactive([])
+const processAssigns = reactive([])
+const finishs = reactive([])
+async function init() {
+    await getProcess(userInfo.id).then((response: any) => {
+        for (let i = 0; i < response.length; i++) {
+            // @ts-ignore
+            processIds.push(response[i].id)
+        }
+    })
+
+    for (let i = 0; i < processIds.length; i++) {
+        let oneProcess = []
+        let finishNum = 0
+        await getProcessAssign(processIds[i]).then((response: any) => {
+            for (let j = 0; j < response.length; j++) {
+                // @ts-ignore
+                oneProcess.push(response[j])
+                // @ts-ignore
+                if (response[j].status === 2) finishNum += 1  // 状态码2表示完成
+            }
+        })
+        processAssigns.push({
+            // @ts-ignore
+            'id': i,
+            // @ts-ignore
+            'processAssign': oneProcess
+        })
+        // @ts-ignore
+        finishs.push(finishNum)
+    }
+}
+init()
+
 const { proxy } = (getCurrentInstance() as ComponentInternalInstance)
-
-const userInfo = window.sessionStorage.userInfo
-console.log(userInfo)
-
+async function routeTo(name, index) {
+    // @ts-ignore
+    await proxy.$router.push({
+        name: name,
+        params: {
+            // @ts-ignore
+            'finish_num': JSON.stringify(finishs[index]), 
+            // @ts-ignore
+            'assigns': JSON.stringify(processAssigns[index].processAssign)
+        }
+    })
+}
 </script>
 
 <template>
@@ -29,16 +74,16 @@ console.log(userInfo)
 
 <div class="main-view">
     <div class = "row">
-    <div v-for="card in cards" :key="card.id" class="card" style="width: 18rem;">
+    <div v-for="(assign, index) in processAssigns" :key="assign.id" class="card" style="width: 18rem;">
         <div class="card-header">
             任务分配
         </div>
         <div class="card-body">
             <h5 class="card-title"><b> 当前进度 </b></h5>
-            <p class="card-text">{{card.content}}</p>
+            <p class="card-text">- {{finishs[index]}} / {{assign.processAssign.length}}</p>
             <div class="links">
-                <router-link :to="card.to" class="router-link">查看数据</router-link>
-                <router-link :to="card.to" class="router-link">开始标注</router-link>
+                <router-link to="/data" class="router-link" @click.native="routeTo('data', index)">查看数据</router-link>
+                <router-link to="/annot" class="router-link" @click.native="routeTo('annot', index)">开始标注</router-link>
             </div>
         </div>
     </div>

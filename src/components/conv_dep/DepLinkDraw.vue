@@ -15,9 +15,6 @@ defineEmits<{
     (e: 'selectLink', link: LinkType): void
 }>()
 
-console.log(props.links)
-console.log(props.tabs)
-console.log(props.linkSelectedId)
 </script>
 
 <template>
