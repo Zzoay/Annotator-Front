@@ -2,13 +2,14 @@
 import {reactive, ref, getCurrentInstance, ComponentInternalInstance} from 'vue'
 
 import Nav from './Nav.vue'
+import { ProcessAssignType } from '@/types/common'
 import ConvDataView from '@/components/conv_dep/ConvDataView.vue'
 
 
 const { proxy } = (getCurrentInstance() as ComponentInternalInstance)
 // @ts-ignore
 // const assigns = JSON.parse(proxy.$route.params.assigns)
-const assigns = reactive(JSON.parse(window.sessionStorage.assigns))
+const assigns: ProcessAssignType = reactive(JSON.parse(window.sessionStorage.assigns))
 const finish_num = ref(0)
 for (let i = 0; i < assigns.length; i++) {
     if (assigns[i].status === 2) finish_num.value += 1

@@ -23,7 +23,10 @@ function updateAssign(convId) {
     assigns[assign_index.value].status = 2
     finish_num.value += 1
   }
+  window.sessionStorage.assigns = JSON.stringify(assigns)
+  window.sessionStorage.finish_num = JSON.stringify(finish_num.value)
 }
+console.log(finish_num)
 </script>
 
 <template>

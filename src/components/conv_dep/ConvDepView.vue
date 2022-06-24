@@ -15,6 +15,7 @@ const props = defineProps<{
     assign_index: number,
     finish_num: number,
 }>()
+console.log(props.finish_num)
 
 const emits = defineEmits([
     'updateAssign'
@@ -51,7 +52,8 @@ function initRelships() {
 
 async function init() {
     await initRelations()
-    // 从任务分配表中找出没标注的第一篇对话
+
+    // 从任务分配表中取出对话ID，1.指定index; 2.取出没标注的第一篇对话id
     for (let i = 0; i < props.assigns.length; i++) {
         if (props.assign_index) {
             convId.value = props.assigns[props.assign_index].item_id
@@ -62,12 +64,14 @@ async function init() {
             break
         }
     }
+
     await getConv(convId.value).then((response: any) => {
         let res = response
         for (let i = 0; i < res.length; i++) {
             conversation.value.push(res[i])
         }
     })
+
     initRelships()
 } 
 init()
@@ -521,7 +525,6 @@ async function saveLinks() {
     }
     initRelships()
 
-    // TODO: 在任务分配表中保存状态
     saveConvStatus()
     saved.value = true
 

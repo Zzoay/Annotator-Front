@@ -15,9 +15,7 @@ const convs: Array<ConvType> = reactive([])
 
 async function init() {
     for (let i = 0; i < props.assigns.length; i++) {
-        if (props.assigns[i].status === 0) {
-            convIds.push(props.assigns[i].item_id)
-        }
+        convIds.push(props.assigns[i].item_id)
     }
     for (let i = 0; i < convIds.length; i++) {
         let convId = convIds[i]
@@ -44,8 +42,8 @@ init()
 const status = reactive(['未标注', '正在标注', '已标注'])
 
 const { proxy } = (getCurrentInstance() as ComponentInternalInstance)
-const assigns = reactive(JSON.parse(window.sessionStorage.assigns))
-const finish_num = ref(JSON.parse(window.sessionStorage.finish_num))
+// const assigns = reactive(JSON.parse(window.sessionStorage.assigns))
+// const finish_num = ref(JSON.parse(window.sessionStorage.finish_num))
 
 async function routeTo(name, index) {
     window.sessionStorage.assign_index = index
@@ -54,8 +52,8 @@ async function routeTo(name, index) {
         name: name,
         params: {
             // @ts-ignore
-            'finish_num': JSON.stringify(finish_num), 
-            'assigns': JSON.stringify(assigns),
+            'finish_num': JSON.stringify(props.finish_num), 
+            'assigns': JSON.stringify(props.assigns),
             'assign_index': index
         }
     })
