@@ -1,26 +1,21 @@
 <script setup lang="ts">
 import { ref, reactive, getCurrentInstance, ComponentInternalInstance} from 'vue'
-import { UteranceType } from '../../types/ConvDepTypes'
-import { getConv, getConvId } from '@/api/api'
+import { ProcessAssignType } from '../../types/common'
+import { ConvType } from '../../types/ConvDepTypes'
+import { getConv } from '@/api/api'
 
-
-const header = '对话依存分析'
 
 const props = defineProps<{ 
-    // TODO: 类型定义
-    assigns: Array<Object>,
+    assigns: ProcessAssignType,
     finish_num: number
 }>()
 
-let convIds = reactive([])
-// TODO: 类型定义
-const convs = reactive([])
+let convIds: Array<number> = reactive([])
+const convs: Array<ConvType> = reactive([])
 
 async function init() {
     for (let i = 0; i < props.assigns.length; i++) {
-        // @ts-ignore
         if (props.assigns[i].status === 0) {
-            // @ts-ignore
             convIds.push(props.assigns[i].item_id)
         }
     }
@@ -28,19 +23,16 @@ async function init() {
         let convId = convIds[i]
         await getConv(convId).then((response: any) => {
             // 默认是分句的, 这里直接拍平
-            let conv = []
+            let conv: Array<string> = []
             for (let j = 0; j < response.length; j++) {
                 // 这里的item指的是词语
                 let items = response[j].items
                 for (let k = 0; k < items.length; k++) {
-                    // @ts-ignore
                     conv.push(items[k].word)
                 }      
             }
             convs.push({
-                // @ts-ignore
                 'id': i,
-                // @ts-ignore
                 'content': conv.join(' ')
             })
         })
@@ -51,13 +43,12 @@ init()
 // 分别对应状态码0,1,2. 1暂时保留
 const status = reactive(['未标注', '正在标注', '已标注'])
 
-
 const { proxy } = (getCurrentInstance() as ComponentInternalInstance)
-// @ts-ignore
-const assigns = JSON.parse(proxy.$route.params.assigns)
-// @ts-ignore
-const finish_num = JSON.parse(proxy.$route.params.finish_num)
+const assigns = reactive(JSON.parse(window.sessionStorage.assigns))
+const finish_num = ref(JSON.parse(window.sessionStorage.finish_num))
+
 async function routeTo(name, index) {
+    window.sessionStorage.assign_index = index
     // @ts-ignore
     await proxy.$router.push({
         name: name,
@@ -73,7 +64,6 @@ async function routeTo(name, index) {
 </script>
 
 <template>
-    <!-- <h5 class="title"> 对话依存分析  </h5> -->
     <div class="table-view">
     <table class="table table-hover">
         <thead class="thead table-light">

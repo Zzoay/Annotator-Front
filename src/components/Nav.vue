@@ -93,7 +93,7 @@ async function routeTo(name) {
         </li>
         <li v-if="pages[pageNow] > 2" class="nav-item active">
             <router-link
-                to="/data"
+                to=""
                 custom>
                 <a class="nav-link" href="#" @click.native="routeTo('data')"> 数据 </a>
             </router-link>

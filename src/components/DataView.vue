@@ -2,26 +2,20 @@
 import {reactive, ref, getCurrentInstance, ComponentInternalInstance} from 'vue'
 
 import Nav from './Nav.vue'
-import SideBar from './SideBar.vue'
 import ConvDataView from '@/components/conv_dep/ConvDataView.vue'
 
-const curTabId = ref(0)
-const tabs = reactive([])
-
-function tabSelected(tabId: number) {
-    console.log(tabId)
-}
 
 const { proxy } = (getCurrentInstance() as ComponentInternalInstance)
 // @ts-ignore
-const assigns = JSON.parse(proxy.$route.params.assigns)
-// // @ts-ignore
+// const assigns = JSON.parse(proxy.$route.params.assigns)
+const assigns = reactive(JSON.parse(window.sessionStorage.assigns))
 const finish_num = ref(0)
 for (let i = 0; i < assigns.length; i++) {
     if (assigns[i].status === 2) finish_num.value += 1
 }
 
 async function routeTo(name) {
+    window.sessionStorage.removeItem('assign_index')
     // @ts-ignore
     await proxy.$router.push({
         name: name,
@@ -36,13 +30,13 @@ async function routeTo(name) {
 
 <template>
   <Nav page-now="/data"></Nav>
-    <div class="box">
-        <div class="title"><b>任务：</b>对话依存分析 </div>
-        <div class="statics">已标注/总计：{{finish_num}}/{{assigns.length}}</div>
+  <div class="box">
+    <div class="title"><b>任务：</b>对话依存分析 </div>
+    <div class="statics">已标注/总计：{{finish_num}}/{{assigns.length}}</div>
 
-        <router-link to="/annot" class="btn btn-outline-primary" id="start_annot" @click.native="routeTo('annot')">开始标注</router-link>
+    <router-link to="" class="btn btn-outline-primary" id="start_annot" @click.native="routeTo('annot')">开始标注</router-link>
 
-    </div>
+  </div>
   <ConvDataView :assigns="assigns" :finish_num="finish_num"> </ConvDataView>
 </template>
 

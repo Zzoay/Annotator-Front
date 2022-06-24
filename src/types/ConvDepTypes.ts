@@ -35,3 +35,8 @@ export type RelshipType = {
     tail: string
     relation: number
 }
+
+export type ConvType = {
+    id: number,
+    content: string
+}

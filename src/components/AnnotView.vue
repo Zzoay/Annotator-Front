@@ -7,16 +7,12 @@ import ConvDepView from '@/components/conv_dep/ConvDepView.vue'
 
 
 const { proxy } = (getCurrentInstance() as ComponentInternalInstance)
-// @ts-ignore
-const assigns = reactive(JSON.parse(proxy.$route.params.assigns))
-// @ts-ignore
-const finish_num = ref(JSON.parse(proxy.$route.params.finish_num))
-// @ts-ignore
-const assign_index = ref(Number(proxy.$route.params.assign_index))
+
+const assigns = reactive(JSON.parse(window.sessionStorage.assigns))
+const finish_num = ref(JSON.parse(window.sessionStorage.finish_num))
+const assign_index = ref(Number(window.sessionStorage.assign_index))
 
 function updateAssign(convId) {
-  console.log(assigns)
-  console.log(convId)
   for (let i = 0; i < assigns.length; i++) {
     if (assigns[i].item_id === convId) {
       assign_index.value = i
@@ -27,7 +23,6 @@ function updateAssign(convId) {
     assigns[assign_index.value].status = 2
     finish_num.value += 1
   }
-  console.log(finish_num)
 }
 </script>
 
@@ -38,7 +33,7 @@ function updateAssign(convId) {
         <SideBar> </SideBar>
     </div>
     <div class="col-10">
-        <ConvDepView :assigns="assigns" :assign_index="assign_index" @update-assign="updateAssign"> </ConvDepView>
+        <ConvDepView :assigns="assigns" :assign_index="assign_index" :finish_num="finish_num" @update-assign="updateAssign"> </ConvDepView>
     </div>
   </div>
 </template>

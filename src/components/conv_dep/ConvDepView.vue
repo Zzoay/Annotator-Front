@@ -4,18 +4,16 @@ import SpanBtn from './SpanBtn.vue'
 import DepLinkDraw from './DepLinkDraw.vue'
 import Dialog from './Dialog.vue'
 import Message from './Message.vue'
+import { ProcessAssignType } from '../../types/common'
 import { UteranceType, LinkType, TabType, RelshipType } from '../../types/ConvDepTypes'
-import {getRelation, getConv, updateConvStatus, updateEntryStatus, getRelationship, postRelationship, deleteRelationship} from '@/api/api'
+import {getRelation, getConv, updateEntryStatus, getRelationship, postRelationship, deleteRelationship} from '@/api/api'
 import bus from '@/libs/bus'
 
 
-// data ------------>
-const header = '对话依存分析'
-
 const props = defineProps<{ 
-    // TODO: 类型定义
-    assigns: Array<Object>,
+    assigns: ProcessAssignType,
     assign_index: number,
+    finish_num: number,
 }>()
 
 const emits = defineEmits([
@@ -59,9 +57,7 @@ async function init() {
             convId.value = props.assigns[props.assign_index].item_id
             break 
         }
-        // @ts-ignore
         if (props.assigns[i].status === 0) {  // 0 表示没标注
-            // @ts-ignore
             convId.value = props.assigns[i].item_id
             break
         }
@@ -140,9 +136,6 @@ const action = ref()  // 操作函数（保存/删除）
 const actionArgs = ref()  // 操作函数的参数
 
 const linkSelectedId = ref(-1)  // 被选中的连接的ID
-
-const { proxy } = (getCurrentInstance() as ComponentInternalInstance)
-
 
 // 全局键盘事件
 document.addEventListener("keydown", function(e) {
@@ -570,18 +563,13 @@ function hideModal() {
 
 <template>
     <div class="main-panel"  @click="globalClick" @select-link="selectLink">
-        <h3>{{ header }}</h3>
+        <!-- <h3>{{ header }}</h3> -->
+        <div class="box">
+            <div class="title"><b>任务：</b>对话依存分析 </div>
+            <!-- <div class="statics"> 当前ID: {{convId}}</div> -->
+            <div class="statics">当前ID: {{convId}} &ensp; 已标注/总计: {{finish_num}}/{{assigns.length}}</div>
 
-        <!-- <LinkTabs             
-            v-for="tab in tabs" 
-            :key="tab.id" 
-            :tab="tab"
-            :cur-tab-id=curTabId
-            :class="curTabId === tab.id ? 'active': ''" 
-            @click.stop="tabSelected(tab.id)">
-            
-        </LinkTabs> -->
-        
+        </div>
         <div class="words-view">
 
         <div :class="'utterance ' + utterance.id" v-for="utterance in conversation" :key="utterance.id" :ref="utrDom">
@@ -625,6 +613,25 @@ function hideModal() {
     padding: 5px;
     margin: 20px 0px 0px 0px;
     width: auto;
+  }
+
+  .box {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 28px 30px 35px 30px;
+    /* margin: 10px 0px 0px 10px; */
+}
+ 
+  .title {
+    float: left;
+    font-size: 18px;
+  }
+
+  .statics {
+    float: right;
+    margin-right: 20px;
+    font-size: 18px;
   }
   
   .words-view{

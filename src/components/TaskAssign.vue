@@ -1,31 +1,17 @@
 <script setup lang="ts">
 import {ref, reactive, getCurrentInstance, ComponentInternalInstance} from 'vue'
+import { AssignType } from '@/types/common'
 import {getProcess, getProcessAssign} from '@/api/api'
 import Nav from './Nav.vue'
 
-
-const cards = reactive([
-    {
-        id: 1,
-        content: "- 0/100",
-        to: "/data",
-    },
-    {
-        id: 2,
-        content: "- 0/100",
-        to: "/data",
-    },
-])
-
 const userInfo = JSON.parse(window.sessionStorage.userInfo)
 
-const processIds = reactive([])
-const processAssigns = reactive([])
-const finishs = reactive([])
+const processIds: Array<number> = reactive([])
+const processAssigns: Array<AssignType> = reactive([])
+const finishs: Array<number> = reactive([])
 async function init() {
     await getProcess(userInfo.id).then((response: any) => {
         for (let i = 0; i < response.length; i++) {
-            // @ts-ignore
             processIds.push(response[i].id)
         }
     })
@@ -37,17 +23,13 @@ async function init() {
             for (let j = 0; j < response.length; j++) {
                 // @ts-ignore
                 oneProcess.push(response[j])
-                // @ts-ignore
                 if (response[j].status === 2) finishNum += 1  // 状态码2表示完成
             }
         })
         processAssigns.push({
-            // @ts-ignore
             'id': i,
-            // @ts-ignore
             'processAssign': oneProcess
         })
-        // @ts-ignore
         finishs.push(finishNum)
     }
 }
@@ -55,13 +37,14 @@ init()
 
 const { proxy } = (getCurrentInstance() as ComponentInternalInstance)
 async function routeTo(name, index) {
+    window.sessionStorage.finish_num = JSON.stringify(finishs[index])
+    window.sessionStorage.assigns = JSON.stringify(processAssigns[index].processAssign)
+    window.sessionStorage.removeItem('assign_index')
     // @ts-ignore
     await proxy.$router.push({
         name: name,
         params: {
-            // @ts-ignore
             'finish_num': JSON.stringify(finishs[index]), 
-            // @ts-ignore
             'assigns': JSON.stringify(processAssigns[index].processAssign)
         }
     })

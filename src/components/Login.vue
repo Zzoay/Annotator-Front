@@ -216,8 +216,8 @@ export default defineComponent({
 }
 
 .login-form {
-  /* min-height: 280px;
-  min-width: 200px; */
+  min-height: 280px;
+  min-width: 200px;
   height: 32vh;
   width: 22vw;
   max-width: 100%;
