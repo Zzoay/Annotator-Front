@@ -50,6 +50,7 @@ function initRelships() {
     })
 }
 
+const idxInAssigns = ref(-1)  // 当前标注在任务分配中的索引
 async function init() {
     await initRelations()
 
@@ -57,10 +58,12 @@ async function init() {
     for (let i = 0; i < props.assigns.length; i++) {
         if (props.assign_index) {
             convId.value = props.assigns[props.assign_index].item_id
+            idxInAssigns.value = props.assign_index
             break 
         }
         if (props.assigns[i].status === 0) {  // 0 表示没标注
             convId.value = props.assigns[i].item_id
+            idxInAssigns.value = i
             break
         }
     }
@@ -435,7 +438,13 @@ async function updateConv(shift: number) {
     
     // 未保存则弹窗确认
     if (saved.value || doAction.value) {
-        convId.value = convId.value + shift
+        idxInAssigns.value = idxInAssigns.value + shift
+        if (props.assigns[idxInAssigns.value] == undefined) {
+            alert("已经没有更多数据了")
+            idxInAssigns.value = idxInAssigns.value - shift
+        }
+        
+        convId.value = props.assigns[idxInAssigns.value].item_id
 
         let res = [{}]
         await getConv(convId.value).then((response: any) => {
@@ -674,10 +683,11 @@ function hideModal() {
 
   .words-view .utterance > button{
     /* border: none; */
+    font-size: small;
     box-shadow: none;
     position: relative;
-    margin: 150px 20px 20px;
-    padding: 6px 8px;
+    margin: 100px 15px 15px;
+    padding: 4px 6px;
     z-index: 10;
   }
 
@@ -688,6 +698,7 @@ function hideModal() {
   }
 
   .bottom-ctrls > button{
+    font-size: small;
     box-shadow: none;
     margin: 0px 25px;
   }
