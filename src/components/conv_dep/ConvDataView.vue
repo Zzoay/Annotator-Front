@@ -25,7 +25,8 @@ async function init() {
             for (let j = 0; j < response.length; j++) {
                 // 这里的item指的是词语
                 let items = response[j].items
-                for (let k = 0; k < items.length; k++) {
+                // 省略 ROOT
+                for (let k = 1; k < items.length; k++) {
                     conv.push(items[k].word)
                 }      
             }
