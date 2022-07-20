@@ -49,7 +49,7 @@ function emitTabSelected(tabId: number) {
     position: fixed;
     padding: 15px;
     /* margin: 0px 10px 0px 0px; */
-    max-width: 240px;
+    max-width: 220px;
     border-top: 1px solid #ccc;
     border-right: 1px solid #ccc;
     border-bottom: 1px solid #ccc;

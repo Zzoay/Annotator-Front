@@ -51,7 +51,6 @@ const cards = reactive([
 <style scoped>
 
 .main-view {
-    display: block;
     margin: 10px;
     padding: 2px 0px 0px 10px;
 }

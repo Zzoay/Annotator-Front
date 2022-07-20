@@ -15,7 +15,6 @@ const props = defineProps<{
     assign_index: number,
     finish_num: number,
 }>()
-console.log(props.finish_num)
 
 const emits = defineEmits([
     'updateAssign'
@@ -56,7 +55,7 @@ async function init() {
 
     // 从任务分配表中取出对话ID，1.指定index; 2.取出没标注的第一篇对话id
     for (let i = 0; i < props.assigns.length; i++) {
-        if (props.assign_index) {
+        if (!Number.isNaN(props.assign_index)) {
             convId.value = props.assigns[props.assign_index].item_id
             idxInAssigns.value = props.assign_index
             break 
@@ -84,7 +83,7 @@ let start: number[] = []
 let end: number[] = []
 let links = ref<Array<Array<LinkType>>>([[]])  // 默认第0层为上下连接
 let linkNums = 0 // 连接的数量，包括删除的，用以保证连接id的唯一性
-const levelHigh = 25  // 单层高度
+const levelHigh = 15  // 单层高度
 
 // 得到每个词的位置信息
 const targets = ref([])
@@ -191,15 +190,20 @@ onBeforeUnmount(() => {
 // methods -------------->
 function calCrdns(start: number[], end: number[], highOffset: number, curLevel: number) {
     // 防止连接重合，需要进行动态的横向偏移
-    let offset = 15 - 5 * (curLevel + 1)
+    let offset = 6 - 3 * (curLevel + 1)
+    // 让线歪一点，不容易重合
+    let midShift = Math.random()// 生成[0, 1)随机数
+    // 随机高度偏移，不容易重合
+    let yShift = Math.random() * 4
     if (start[0] > end[0]){  // 默认右向连接，如果左向则offset取反
         offset = - offset
+        midShift = -midShift
     }
     // +20是预估的默认值，offset为0时，连接的起点和终点大致上在中间位置
-    let startStr = (start[0] + 20 + offset).toString() + ',' + (start[1]).toString()
-    let mid1 = (start[0] + 20 + offset).toString() + ',' + highOffset.toString()
-    let mid2 = (end[0] + 20 - offset).toString() + ',' + highOffset.toString()
-    let endStr = (end[0] + 20 - offset).toString() + ',' + (end[1] - 10).toString()
+    let startStr = (start[0] + 15 + offset).toString() + ',' + (start[1]).toString()
+    let mid1 = (start[0] + 15 + offset + midShift).toString() + ',' + (highOffset + yShift).toString()
+    let mid2 = (end[0] + 15 - offset - midShift).toString() + ',' + (highOffset + yShift).toString()
+    let endStr = (end[0] + 15 - offset).toString() + ',' + (end[1] - 5).toString()  // end - 'h', 'h'是给箭头预留的高度
     return startStr + ' ' + mid1 + ' ' + mid2 + ' ' + endStr
 }
 
@@ -584,7 +588,7 @@ function hideModal() {
         </div>
         <div class="words-view">
 
-        <div :class="'utterance ' + utterance.id" v-for="utterance in conversation" :key="utterance.id" :ref="utrDom">
+        <div class="utterance" v-for="utterance in conversation" :key="utterance.id" :ref="utrDom">
 
             <SpanBtn v-for="item in utterance.items" :key="item.id" :item="item" ref="words"
                 :is-selected="utterance.id + '-' + item.id === selectedId"
@@ -660,7 +664,8 @@ function hideModal() {
   .words-view .utterance{
     /* position: relative; */
     display: block;
-    align-items: stretch;
+    /* align-items: stretch; */
+    /* white-space:nowrap; */
   }
 
   .words-view .link-draw .line-draw{
@@ -683,12 +688,13 @@ function hideModal() {
 
   .words-view .utterance > button{
     /* border: none; */
-    font-size: small;
+    font-size: x-small;
     box-shadow: none;
     position: relative;
-    margin: 100px 15px 15px;
-    padding: 4px 6px;
+    margin: 160px 12px 12px;
+    padding: 2px 4px;
     z-index: 10;
+    min-width: 21px;
   }
 
   .bottom-ctrls {
@@ -698,9 +704,9 @@ function hideModal() {
   }
 
   .bottom-ctrls > button{
-    font-size: small;
+    font-size: x-small;
     box-shadow: none;
-    margin: 0px 25px;
+    margin: 0px 20px;
   }
 
 </style>

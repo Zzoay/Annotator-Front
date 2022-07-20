@@ -41,17 +41,17 @@ const transform = computed(() => {
     // 进行X轴方向缩放,X值越大,距离越远
     let translateX = signX.value * length.value / 1.6 - 10
     // 进行Y轴方向缩放,Y值越大,距离越近
-    let translateY =  deg.value > 0 ? 14 * (60 / length.value) : -14 * (60 / length.value) - 10
+    let translateY =  deg.value > 0 ? 10 * (60 / length.value) : -14 * (60 / length.value)
     return 'rotate(' + deg.value + ') ' + "translate(" + translateX + ',' + translateY + ')'
 })
 
 const rectX = computed(() => {
-    if (props.link.linkType == 'polyline') return (props.link.start[0] + props.link.end[0]) / 2
+    if (props.link.linkType == 'polyline') return (props.link.start[0] + props.link.end[0]) / 2 + 4
     return props.link.start[0]
 })
 
 const rectY = computed(() => {
-    if (props.link.linkType == 'polyline') return props.link.highOffset - 10
+    if (props.link.linkType == 'polyline') return props.link.highOffset - 7.5
     return props.link.start[1]
 })
 
@@ -66,22 +66,22 @@ const textY = computed(() => {
 })
 
 const cancelCircleX = computed(() => {
-    if (props.link.linkType == 'polyline') return (props.link.start[0] + props.link.end[0]) / 2 + 36
+    if (props.link.linkType == 'polyline') return (props.link.start[0] + props.link.end[0]) / 2 + 30
     return props.link.start[0] + 36
 })
 
 const cancelCircleY = computed(() => {
-    if (props.link.linkType == 'polyline') return props.link.highOffset - 10
+    if (props.link.linkType == 'polyline') return props.link.highOffset - 6
     return props.link.start[1] + 2
 })
 
 const cancelX = computed(() => {
-    if (props.link.linkType == 'polyline') return (props.link.start[0] + props.link.end[0]) / 2 + 38
+    if (props.link.linkType == 'polyline') return (props.link.start[0] + props.link.end[0]) / 2 + 34
     return props.link.start[0] + 38
 })
 
 const cancelY = computed(() => {
-    if (props.link.linkType == 'polyline') return props.link.highOffset - 8
+    if (props.link.linkType == 'polyline') return props.link.highOffset - 4
     return props.link.start[1] + 2
 })
 </script>
@@ -96,8 +96,8 @@ const cancelY = computed(() => {
         >
     
         <rect
-            rx="5" ry="5" 
-            width="36" height="18"
+            rx="3" ry="3" 
+            width="28" height="14"
             style="position: absolute; z-index: 5"
             cursor="pointer"
             :x=rectX 
@@ -108,7 +108,7 @@ const cancelY = computed(() => {
         <text 
             text-anchor="middle" 
             fill="#fff"
-            font-size="10px"
+            font-size="8px"
             cursor="pointer"
             style="position: absolute; z-index: 5"
             :x=textX 
@@ -128,7 +128,7 @@ const cancelY = computed(() => {
 
         <text 
             text-anchor="middle" 
-            font-size="10px"
+            font-size="9px"
             cursor="pointer"
             :x=cancelX 
             :y=cancelY 

@@ -186,9 +186,8 @@ export default defineComponent({
 
 <style lang="css" scoped>
 .main-panel {
-    height: 100vh;
+    height: 80vh;
     width: 100%;
-    overflow: hidden;
 }
 
 .row {
@@ -197,8 +196,7 @@ export default defineComponent({
 }
 
 .col {
-    /* height: 100%; */
-    margin: 0 0 20vh 0;
+    margin: 0 0 0 0;
     width: 100%;
     display:flex;
     align-items: center;

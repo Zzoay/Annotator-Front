@@ -17,7 +17,7 @@ defineProps<{
 
     <polyline
         fill="none" 
-        stroke-width="3"
+        stroke-width="1.5"
         :marker-end="'url(#arrow' + link.id +')'" 
         :points="link.coordinates" 
         :stroke="linkStroke" 

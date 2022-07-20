@@ -9,9 +9,15 @@ const props = defineProps<{
     isSelected: boolean,
 }>()
 
+const colors = [
+    '#F19D57',
+    '#7B68EE',
+]
+
 // computed
 const itemColor = computed(() => {
-    return props.item.id == 0 ? '#F19D57' : ''
+    // return props.item.id == 0 ? '#F19D57' : ''
+    return colors[props.item.id ]
 })
 </script>
 
@@ -29,8 +35,8 @@ const itemColor = computed(() => {
 <style scoped>
 button {
     background-color: #fff;
-    padding: 4px 6px;
-    margin: 8px;
+    padding: 2px 4px;
+    margin: 6px;
 }
 
 .btn .btn-outline-secondary :hover {

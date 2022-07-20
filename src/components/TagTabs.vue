@@ -31,9 +31,10 @@ const color = computed(() => {
 
 <style scoped>
 .btn {
+    font-size: small;
     background-color: #fff;
     padding: 2px 4px !important;
-    margin: 6px !important;
+    margin: 4px !important;
 }
 
 .btn.btn-outline-secondary:hover {
