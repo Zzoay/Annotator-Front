@@ -31,9 +31,9 @@ const color = computed(() => {
 
 <style scoped>
 .btn {
-    font-size: small;
+    font-size: x-small;
     background-color: #fff;
-    padding: 2px 4px !important;
+    padding: 1px 3px !important;
     margin: 4px !important;
 }
 

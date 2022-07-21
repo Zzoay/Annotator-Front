@@ -39,9 +39,9 @@ const length = computed(() => {
 const transform = computed(() => {
     if (props.link.linkType == 'polyline') return
     // 进行X轴方向缩放,X值越大,距离越远
-    let translateX = signX.value * length.value / 1.6 - 10
+    let translateX = signX.value * length.value / 1.1
     // 进行Y轴方向缩放,Y值越大,距离越近
-    let translateY =  deg.value > 0 ? 10 * (60 / length.value) : -14 * (60 / length.value)
+    let translateY =  deg.value > 0 ? 16 * (60 / length.value) : -16 * (100 / length.value)
     return 'rotate(' + deg.value + ') ' + "translate(" + translateX + ',' + translateY + ')'
 })
 
@@ -57,12 +57,12 @@ const rectY = computed(() => {
 
 const textX = computed(() => {
     if (props.link.linkType == 'polyline') return (props.link.start[0] + props.link.end[0]) / 2 + 18
-    return props.link.start[0] + 18
+    return props.link.start[0] + 14
 })
 
 const textY = computed(() => {
     if (props.link.linkType == 'polyline') return props.link.highOffset + 2
-    return props.link.start[1] + 13
+    return props.link.start[1] + 10
 })
 
 const cancelCircleX = computed(() => {

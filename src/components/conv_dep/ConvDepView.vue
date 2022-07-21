@@ -194,14 +194,14 @@ function calCrdns(start: number[], end: number[], highOffset: number, curLevel: 
     // 让线歪一点，不容易重合
     let midShift = Math.random()// 生成[0, 1)随机数
     // 随机高度偏移，不容易重合
-    let yShift = Math.random() * 4
+    let yShift = Math.random() * 5
     if (start[0] > end[0]){  // 默认右向连接，如果左向则offset取反
         offset = - offset
         midShift = -midShift
     }
     // +20是预估的默认值，offset为0时，连接的起点和终点大致上在中间位置
     let startStr = (start[0] + 15 + offset).toString() + ',' + (start[1]).toString()
-    let mid1 = (start[0] + 15 + offset + midShift).toString() + ',' + (highOffset + yShift).toString()
+    let mid1 = (start[0] + 15 + offset + midShift).toString() + ',' + (highOffset + yShift + midShift).toString()
     let mid2 = (end[0] + 15 - offset - midShift).toString() + ',' + (highOffset + yShift).toString()
     let endStr = (end[0] + 15 - offset).toString() + ',' + (end[1] - 5).toString()  // end - 'h', 'h'是给箭头预留的高度
     return startStr + ' ' + mid1 + ' ' + mid2 + ' ' + endStr
@@ -344,9 +344,9 @@ function linkDiffHigh(start:number[], end: number[], startId: string, endId: str
         console.log("向上连接")
         item.start = [start[0] + 20, start[1]]
         item.end = [end[0] + 20, end[1] + 42]
-        let startStr = item.start[0].toString() + ',' + item.start[1].toString()
+        let startStr = (item.start[0] - 10).toString() + ',' + item.start[1].toString()
         let mid = ((start[0] + end[0]) / 2).toString() + ',' + ((start[1] + end[1]) / 2).toString()
-        let endStr = item.end[0].toString() + ',' + item.end[1].toString()
+        let endStr = (item.end[0] - 10).toString() + ',' + (item.end[1] - 13).toString()
         item.coordinates = 'M' + startStr + ' Q' + mid + ' ' + endStr
     }
     // 向下连接
@@ -354,9 +354,9 @@ function linkDiffHigh(start:number[], end: number[], startId: string, endId: str
         console.log("向下连接")
         item.start = [start[0] + 20, start[1] + 40]
         item.end = [end[0] + 20, end[1] - 8]
-        let startStr = item.start[0].toString() + ',' + item.start[1].toString()
+        let startStr = (item.start[0] - 10).toString() + ',' + (item.start[1] - 14).toString()
         let mid = ((start[0] + end[0]) / 2).toString() + ',' + ((start[1] + end[1]) / 2).toString()
-        let endStr = item.end[0].toString() + ',' + item.end[1].toString()
+        let endStr = item.end[0].toString() + ',' + (item.end[1] + 3).toString()
         item.coordinates = 'M' + startStr + ' Q' + mid + ' ' + endStr 
     }
     links.value[0].push(item)

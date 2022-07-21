@@ -16,7 +16,7 @@ defineProps<{
     </marker>
 
     <path
-        stroke-width="3"
+        stroke-width="1.5"
         fill="none"
         :marker-end="'url(#arrow' + link.id +')'"
         :stroke="linkStroke"

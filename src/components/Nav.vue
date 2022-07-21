@@ -119,7 +119,7 @@ async function routeTo(name) {
 
 <style>
 .navbar {
-    max-width: 100%;
+    max-width: 100% !important;
     background-color: #fff;
     border-bottom: 1px solid #ccc;
     border-radius: 1px;
