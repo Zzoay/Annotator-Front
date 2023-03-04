@@ -75,7 +75,7 @@ async function routeTo(name, index) {
         </thead>
         <tbody>
             <tr v-for="(conv, index) in convs" :key="conv.id">
-                <th scope="row">{{assigns[index].id}}</th>
+                <th scope="row">{{assigns[index].item_id}}</th>
                 <td class="col-text">{{conv.content}}</td>
                 <td>{{status[assigns[index].status]}}</td>
                 <td><router-link to="" class="router-link" @click="routeTo('annot', index)">标注</router-link></td>

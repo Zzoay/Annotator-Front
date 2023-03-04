@@ -3,6 +3,7 @@
 
 defineProps<{ 
     showMessage: boolean,
+    canClose: boolean,
 }>()
 
 </script>
@@ -17,7 +18,7 @@ defineProps<{
                         <h5 class="modal-title">
                             <slot name="title"></slot>
                         </h5>
-                        <button type="button" class="close" @click="$emit('hide-message')">
+                        <button type="button" class="close" v-if="canClose" @click="$emit('hide-message')">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>

@@ -47,9 +47,9 @@ function emitTabSelected(tabId: number) {
 <style scoped>
 .sidebar {
     position: fixed;
-    padding: 15px;
+    padding: 10px;
     /* margin: 0px 10px 0px 0px; */
-    max-width: 220px;
+    max-width: 145px;
     border-top: 1px solid #ccc;
     border-right: 1px solid #ccc;
     border-bottom: 1px solid #ccc;

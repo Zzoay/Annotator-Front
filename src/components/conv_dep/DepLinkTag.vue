@@ -46,7 +46,7 @@ const transform = computed(() => {
 })
 
 const rectX = computed(() => {
-    if (props.link.linkType == 'polyline') return (props.link.start[0] + props.link.end[0]) / 2 + 4
+    if (props.link.linkType == 'polyline') return (props.link.start[0] + props.link.end[0]) / 2 
     return props.link.start[0]
 })
 
@@ -57,7 +57,7 @@ const rectY = computed(() => {
 
 const textX = computed(() => {
     if (props.link.linkType == 'polyline') return (props.link.start[0] + props.link.end[0]) / 2 + 18
-    return props.link.start[0] + 14
+    return props.link.start[0] + 17
 })
 
 const textY = computed(() => {
@@ -97,7 +97,7 @@ const cancelY = computed(() => {
     
         <rect
             rx="3" ry="3" 
-            width="28" height="14"
+            width="36" height="14"
             style="position: absolute; z-index: 5"
             cursor="pointer"
             :x=rectX 

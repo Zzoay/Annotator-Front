@@ -35,8 +35,15 @@ let convId = ref(0)
 const conversation = ref<Array<UteranceType>>([])
 
 function saveConvStatus() {
-    updateEntryStatus(convId.value, 2)  // 2 表示完成
-    emits('updateAssign', convId.value)
+    for (let i = 0; i < props.assigns.length; i++) {
+        if (props.assigns[i].item_id === convId.value) {
+            updateEntryStatus(props.assigns[i].id, 2)  // 2 表示完成
+            emits('updateAssign', i)
+            break
+        }
+    }
+    // updateEntryStatus(convId.value, 2)  // 2 表示完成
+    // emits('updateAssign', convId.value)
 }
 
 const relships = ref<Array<RelshipType>>([]) 
@@ -115,14 +122,14 @@ watch(relships, (newValue, oldValue) => {
             let tailUtr = Number(tailSplit[0])
             let tailWord = Number(tailSplit[1])
 
-            console.log(relships)
-            console.log(targets)
+            // console.log(relships)
+            // console.log(targets)
 
             let start = targets.value[headUtr][headWord] 
             let end = targets.value[tailUtr][tailWord]
             
             // 判断是句内还是跨句
-            if (headUtr == tailUtr)
+            if (start[1] === end[1])
                 schedule(start, end, relships.value[i]['head'], relships.value[i]['tail'], start[1], 1, relships.value[i]['relation']) 
             else
                 linkDiffHigh(start, end, relships.value[i]['head'], relships.value[i]['tail'], relships.value[i]['relation'])
@@ -143,8 +150,11 @@ const actionArgs = ref()  // 操作函数的参数
 
 const linkSelectedId = ref(-1)  // 被选中的连接的ID
 
+const operationEnable = ref(true)  // 操作被允许
+
 // 全局键盘事件
 document.addEventListener("keydown", function(e) {
+    if (!operationEnable.value) return
     // S
     if (e.key == "s") {
         saveLinks()
@@ -218,12 +228,12 @@ function selectAndLink(utrId: number, itemId: number, target: any) {  // 事实�
         let highOffset = target.offsetTop
         
         // 同一高度的span进行连接，为防止重合，需要进行全局的调度
-        if (start[1] == end[1]) {
+        if (start[1] === end[1]) {
             schedule(start, end, selectedId.value, utrId + '-' + itemId, highOffset)
         }
         // 不同高度的span进行连接
         else {
-            console.log("不同高度的span进行连接")
+            // console.log("不同高度的span进行连接")
             linkDiffHigh(start, end, selectedId.value, utrId + '-' + itemId)
         }
     }
@@ -258,24 +268,24 @@ function schedule(start: number[], end: number[], startId: string, endId: string
             let c2 = curr.start[0] < curr.end[0] ? curr.end[0] : curr.start[0]
             // 1. x1 < x2 <= c1 < c2 或 c1 < c2 <= x1 < x2，即无交叉，待加入元素和当前层元素继续对比
             if (x2 <= c1 || c2 <= x1) {
-                console.log("情况1:无交叉，待加入元素和当前层元素继续对比")
+                // console.log("情况1:无交叉，待加入元素和当前层元素继续对比")
             }
             // 2. c1 <= x1 < x2 <= c2，即当前元素应包裹加入的元素 => 当前元素上升到上一层并和该层元素对比，待加入元素和当前层元素继续对比
             else if (c1 <= x1 && x2 <= c2) {
-                console.log("情况2:当前元素应包裹加入的元素")
+                // console.log("情况2:当前元素应包裹加入的元素")
                 // 先删除后添加
                 level.splice(j, 1)
                 schedule(curr.start, curr.end, curr.startId, curr.endId, curr.highOffset, i + 1, curr.relType)
             }
             // 3. x1 <= c1 < c2 <= x2，即加入的元素应包裹当前元素 => 待加入元素元素上升到上一层并和该层元素对比
             else if (x1 <= c1 && c2 <= x2) {
-                console.log("情况3:加入的元素应包裹当前元素")
+                // console.log("情况3:加入的元素应包裹当前元素")
                 curLevel += 1
                 break
             }
             // 4. x1 < c1 < x2 < c2 或 c1 < x1 < c2 < x2，即交叉且非包裹关系，长度较长的上升到上一层
             else{
-                console.log("情况4:交叉且非包裹关系，长度较长的上升到上一层")
+                // console.log("情况4:交叉且非包裹关系，长度较长的上升到上一层")
                 if (x2 - x1 >= c2 - c1) {  // 待加入元素更长
                     curLevel += 1
                     break
@@ -341,7 +351,7 @@ function linkDiffHigh(start:number[], end: number[], startId: string, endId: str
     }
     // 向上连接
     if (start[1] > end[1]) {
-        console.log("向上连接")
+        // console.log("向上连接")
         item.start = [start[0] + 20, start[1]]
         item.end = [end[0] + 20, end[1] + 42]
         let startStr = (item.start[0] - 10).toString() + ',' + item.start[1].toString()
@@ -351,7 +361,7 @@ function linkDiffHigh(start:number[], end: number[], startId: string, endId: str
     }
     // 向下连接
     else {
-        console.log("向下连接")
+        // console.log("向下连接")
         item.start = [start[0] + 20, start[1] + 40]
         item.end = [end[0] + 20, end[1] - 8]
         let startStr = (item.start[0] - 10).toString() + ',' + (item.start[1] - 14).toString()
@@ -517,31 +527,36 @@ async function cancelLinks() {
 }
 
 async function saveLinks() {
-    // 保存数据的操作相对安全，不需要弹窗确认
     if (saved.value) return
+
+    showMessage("保存中...") 
+    operationEnable.value = false
+
     // 先删除
     for (let i = 0; i < relships.value.length; i++) {
-        await deleteRelationship(relships.value[i].id)
+        deleteRelationship(relships.value[i].id)
     }
     relships.value = []
 
     // 后添加
-    let tmp = {}
+    let tmp = []
     for (let i = 0; i < links.value.flat().length; i++) {
-        tmp = {
+        tmp.push({
             conv: convId.value,
             head: links.value.flat()[i].startId,
             tail: links.value.flat()[i].endId,
             relation: links.value.flat()[i].relType,
-        }
-        await postRelationship(tmp)
+        })
+        
     }
+    await postRelationship(tmp)
     initRelships()
 
     saveConvStatus()
     saved.value = true
 
-    showMessage("保存成功") 
+    operationEnable.value = true
+    massage.value = "保存成功"
 }
 
 const showSaveMessage = ref(false)
@@ -550,9 +565,9 @@ const massage = ref('')
 function showMessage(message) {
     showSaveMessage.value = true
     massage.value = message
-    setTimeout(() => {
-      showSaveMessage.value = false
-    }, 800)
+    // setTimeout(() => {
+    //   showSaveMessage.value = false
+    // }, 1200)
 }
 
 function hideMessage() {
@@ -603,10 +618,10 @@ function hideModal() {
     </div>
 
     <div class="bottom-ctrls">
-        <button class="btn btn-outline-primary" @click="updateConv(-1)">上一个</button>
-        <button class="btn btn-outline-danger" @click="cancelLinks">取消</button>
-        <button class="btn btn-outline-success" @click="saveLinks">保存</button>
-        <button class="btn btn-outline-primary" @click="updateConv(+1)">下一个</button>
+        <button class="btn btn-outline-primary" v-if="operationEnable" @click="updateConv(-1)">上一个</button>
+        <button class="btn btn-outline-danger" v-if="operationEnable" @click="cancelLinks">取消</button>
+        <button class="btn btn-outline-success" v-if="operationEnable" @click="saveLinks">保存</button>
+        <button class="btn btn-outline-primary" v-if="operationEnable" @click="updateConv(+1)">下一个</button>
     </div>
 
     <Dialog :showModal="showModal" :nextPrev="nextPrev" @hide-modal="hideModal" @doAction="doAction=true; cofirmAction(action, actionArgs);"> 
@@ -614,7 +629,7 @@ function hideModal() {
         确认<strong>&ensp;{{dialogBody}}&ensp;</strong>吗？
     </Dialog>
 
-    <Message :showMessage="showSaveMessage" @hide-message="hideMessage"> 
+    <Message :showMessage="showSaveMessage" :canClose="operationEnable" @hide-message="hideMessage"> 
         <template #title>消息</template>
         {{massage}}
     </Message>
